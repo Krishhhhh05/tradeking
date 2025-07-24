@@ -1,219 +1,317 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from 'react';
+import axios from 'axios'; // For API calls
+import { Link } from 'react-router-dom';
+
+const BASE_URL = 'https://apexapin.theplatformapi.com/api/apigateway/';
+const REFERRAL_API = '/api/admin/public/api/v1/user/';
+
+
+// axios.get('/api/admin/public/api/v1/user/' + referralCode)
+
 
 function Signup() {
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
+    mobile: '',
     password: '',
-    confirmPassword: '',
-    language: 'English',
-    referralCode: ''
-  })
+    referralCode: '', // New input for referral code
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [log, setLog] = useState(null); // For debugging logs/output
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
-    })
-  }
+    });
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!')
-      return
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setLog("Starting login process...");
+
+    try {
+      // 1️⃣ Step 1: Fetch referral code user data
+      const referralUrl = `${REFERRAL_API}${formData.referralCode}`;
+      const referralRes = await axios.get(referralUrl);
+      const referralData = referralRes.data.data;
+      console.log("Referral Response:", referralData);
+
+      // 2️⃣ Step 2: Prepare second API request body
+      const requestBody = {
+        accountID: -1,
+        accountMirroringAccountIds: referralData.accountMirroringAccountIds || [],
+        accountMirroringPolicyId: -1,
+        address: referralData.address || "",
+        currencySign: referralData.currencySign || "",
+        accountIdPrefix: referralData.accountIdPrefix || "",
+        userAgentCommissionPolicyAccountDTOS: [
+          {
+            agentCommissionPolicyId: 0,
+            agentCommissionAccountId: 0
+          }
+        ],
+        clientPriceExecution: referralData.clientPriceExecution,
+        canTransferMoney: referralData.canTransferMoney,
+        canTransferPosition: referralData.canTransferPosition,
+        country: referralData.country || "Afghanistan",
+        currenciesPolicyID: referralData.currenciesPolicyId,
+        firstName: referralData.firstName || "User",
+        forceChangePassword: false,
+        genericPolicyID: referralData.genericPolicyId,
+        ignoreLiquidation: referralData.ignoreLiquidation,
+        isAllowMultiSession: referralData.allowMultiSession,
+        isDemo: referralData.demo,
+        isLocked: referralData.locked,
+        lastName: "",
+        mobile: "",
+        parentId: referralData.parentId,
+        password: formData.password, // From user input
+        secondPassword: "",
+        investorPassword: "",
+        percentageLevel1: referralData.percentageLevel1,
+        percentageLevel2: referralData.percentageLevel2,
+        percentageLevel3: referralData.percentageLevel3,
+        percentageLevel4: referralData.percentageLevel4,
+        creditLoanPercentage: referralData.creditLoanPercentage,
+        roboDealerPolicyId: -1,
+        telephonePass: "",
+        tradingType: referralData.tradingType,
+        userCurrencyId: referralData.userCurrencyId,
+        userType: referralData.userType,
+        username: formData.mobile, // You can customize this logic
+        validateMoneyBeforeClose: referralData.validateMoneyBeforeClose,
+        validateMoneyBeforeEntry: referralData.validateMoneyBeforeEntry,
+        closeOnly: referralData.closeOnly,
+        openOnly: referralData.openOnly,
+        noSellAtLoss: referralData.noSellAtLoss,
+        enableCashDelivery: referralData.enableCashDelivery,
+        enableDepositRequest: referralData.enableDepositRequest,
+        canCreateOrUpdateEntryOrder: referralData.canCreateOrUpdateEntryOrder,
+        sendCredentialsEmailToUser: true,
+        isVerified: referralData.isVerified,
+        ignoreBlockTradeIfInLoss: referralData.ignoreBlockTradeIfInLoss,
+        userWhiteListIps: [],
+        enableApi: referralData.enableApi,
+        chargeMarginForEntry: referralData.chargeMarginForEntry,
+      };
+
+      console.log("Second API Request Body:", requestBody);
+
+      // 3️⃣ Step 3: Make second API call (replace below URL with actual endpoint)
+      const secondApiUrl = `${BASE_URL}admin/public/api/v1/user`; // REPLACE this
+      const secondRes = await axios.post(secondApiUrl, requestBody);
+      console.log("Second API Response:", secondRes.data);
+
+      setLog("Login process completed successfully.");
+    } catch (error) {
+      console.error("Error during login process:", error);
+      setLog(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
-    
-    // Handle signup logic here
-    console.log('Signup attempt:', formData)
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-32 w-24 h-24 bg-purple-500/20 rounded-full blur-xl animate-pulse delay-700"></div>
-        <div className="absolute bottom-32 left-40 w-40 h-40 bg-pink-500/20 rounded-full blur-xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 right-20 w-28 h-28 bg-cyan-500/20 rounded-full blur-xl animate-pulse delay-500"></div>
-      </div>
+    <div className="min-h-screen relative overflow-hidden" style={{
+      backgroundImage: "url('/eth.png')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }}>
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/40"></div>
+      
+      {/* Blue hexagonal glowing effects scattered around */}
+      <div className="absolute top-16 left-8 w-8 h-8 bg-cyan-400/60 rounded-full blur-md animate-pulse"></div>
+      <div className="absolute top-32 left-16 w-6 h-6 bg-blue-400/50 rounded-full blur-sm animate-pulse delay-300"></div>
+      <div className="absolute top-48 left-12 w-4 h-4 bg-cyan-300/70 rounded-full blur-sm animate-pulse delay-700"></div>
+      <div className="absolute top-64 left-20 w-5 h-5 bg-blue-300/60 rounded-full blur-md animate-pulse delay-1000"></div>
+      <div className="absolute top-80 left-6 w-7 h-7 bg-cyan-500/50 rounded-full blur-md animate-pulse delay-500"></div>
+      <div className="absolute bottom-32 left-10 w-6 h-6 bg-blue-400/60 rounded-full blur-sm animate-pulse delay-200"></div>
+      <div className="absolute bottom-48 left-24 w-4 h-4 bg-cyan-300/80 rounded-full blur-sm animate-pulse delay-800"></div>
 
-      {/* Hexagonal pattern overlay */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="h-full w-full" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}></div>
-      </div>
-
-      <div className="relative z-10 flex items-center justify-between min-h-screen px-8">
+      <div className="relative z-10 flex items-center justify-between min-h-screen">
         {/* Left side - Logo and Features */}
-        <div className="flex-1 max-w-lg">
+        <div className="flex-1 max-w-lg px-8">
           {/* Logo */}
-          <div className="mb-12">
+          <div className="mb-16">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
-                <div className="w-8 h-8 bg-white/20 rounded backdrop-blur-sm flex items-center justify-center">
-                  <div className="w-4 h-4 bg-gradient-to-r from-cyan-300 to-purple-400 rounded-sm"></div>
-                </div>
+              <div className="w-16 h-16">
+                <svg viewBox="0 0 64 64" className="w-full h-full">
+                  {/* Cyan/Teal part */}
+                  <path d="M8 16 L32 8 L56 16 L48 24 L32 20 L16 24 Z" fill="#22d3ee" />
+                  {/* Pink/Magenta part */}
+                  <path d="M16 24 L32 20 L48 24 L56 40 L32 48 L8 40 Z" fill="#ec4899" />
+                  {/* White highlights */}
+                  <path d="M20 28 L32 24 L44 28 L40 32 L32 30 L24 32 Z" fill="white" fillOpacity="0.3" />
+                </svg>
               </div>
-              <span className="text-2xl font-bold text-white">TRADEXKING</span>
+              <div>
+                <div className="text-2xl font-bold text-white tracking-wider">TRADEXKING</div>
+              </div>
             </div>
           </div>
 
-          {/* Features */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center mb-4">
+          {/* Features Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Zero Brokerage */}
+            <div className="bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300">
+              <div className="w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" />
                 </svg>
               </div>
-              <h3 className="text-white font-semibold mb-2">ZERO BROKERAGE</h3>
-              <p className="text-white/70 text-sm">Trade without any commission fees</p>
+              <div className="text-center">
+                <h3 className="text-white font-semibold text-sm mb-1">ZERO</h3>
+                <p className="text-white/80 text-xs">BROKERAGE</p>
+              </div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center mb-4">
+            {/* Instant Payouts */}
+            <div className="bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300">
+              <div className="w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
+                  <path d="M8 1v4m8-4v4" />
                 </svg>
               </div>
-              <h3 className="text-white font-semibold mb-2">INSTANT PAYOUTS</h3>
-              <p className="text-white/70 text-sm">Get your funds instantly</p>
+              <div className="text-center">
+                <h3 className="text-white font-semibold text-sm mb-1">INSTANT</h3>
+                <p className="text-white/80 text-xs">PAYOUTS</p>
+              </div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg flex items-center justify-center mb-4">
+            {/* Up to 500x */}
+            <div className="bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300">
+              <div className="w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h3 className="text-white font-semibold mb-2">UPTO 500x</h3>
-              <p className="text-white/70 text-sm">Maximum leverage available</p>
+              <div className="text-center">
+                <h3 className="text-white font-semibold text-sm mb-1">UPTO</h3>
+                <p className="text-white/80 text-xs">500x</p>
+              </div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg flex items-center justify-center mb-4">
+            {/* Indian & International Markets */}
+            <div className="bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300">
+              <div className="w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M2 12h20m-10-10v20" />
                 </svg>
               </div>
-              <h3 className="text-white font-semibold mb-2">GLOBAL MARKETS</h3>
-              <p className="text-white/70 text-sm">Trade Indian & International markets</p>
+              <div className="text-center">
+                <h3 className="text-white font-semibold text-sm mb-1">INDIAN &</h3>
+                <p className="text-white/80 text-xs">INTERNATIONAL</p>
+                <p className="text-white/80 text-xs">MARKETS</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right side - Signup Form */}
-        <div className="flex-1 max-w-md ml-8">
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-                  REGISTER
-                </span>
-                <span className="text-pink-500 ml-2">HERE</span>
-              </h1>
-              <p className="text-white/70 text-lg">Let's Get Started!</p>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-                  placeholder="Full Name"
-                />
-              </div>
-              
-              <div>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-                  placeholder="Email Address"
-                />
-              </div>
-              
-              <div>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-                  placeholder="Password"
-                />
-              </div>
-              
-              <div>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-                  placeholder="Confirm Password"
-                />
-              </div>
-
-              <div>
-                <select
-                  name="language"
-                  value={formData.language}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-                >
-                  <option value="English" className="bg-gray-800">English</option>
-                  <option value="Hindi" className="bg-gray-800">Hindi</option>
-                  <option value="Spanish" className="bg-gray-800">Spanish</option>
-                  <option value="French" className="bg-gray-800">French</option>
-                </select>
-              </div>
-              
-              <div>
-                <input
-                  type="text"
-                  name="referralCode"
-                  value={formData.referralCode}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-                  placeholder="Referral Code (Optional)"
-                />
-              </div>
-              
-              <button
-                onClick={handleSubmit}
-                className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-              >
-                Sign Up
-              </button>
-            </div>
-            
-            <div className="mt-6 text-center">
-              <p className="text-white/70">
-                Already have an account?{' '}
-                <Link to="/login" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors duration-300">
-                  Log in here.
-                </Link>
-              </p>
-            </div>
+        {/* Right side - Registration Form */}
+        <div className="flex-1 max-w-md mx-8">
+          <div className="text-center mb-8">
+            <h1 className="text-5xl font-bold mb-2">
+              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                REGISTER
+              </span>
+              <span className="text-pink-500 ml-2">HERE</span>
+            </h1>
+            <p className="text-white text-xl">Let's Get Started!</p>
           </div>
+
+          <div className="space-y-4">
+            <input
+              type="text"
+              name="referralCode"
+              value={formData.referralCode}
+              onChange={handleChange}
+              required
+              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              placeholder="User Name"
+            />
+
+            <input
+              type="number"
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleChange}
+              required
+              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              placeholder="Mobile Number"
+            />
+
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              placeholder="Password"
+            />
+
+            <input
+              type="password"
+              name="confirmPassword"
+              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              placeholder="Confirm Password"
+            />
+
+            <div className="relative">
+              <select className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm appearance-none">
+                <option value="" className="bg-gray-800">RM Support Language</option>
+                <option value="english" className="bg-gray-800">English</option>
+                <option value="hindi" className="bg-gray-800">Hindi</option>
+                <option value="spanish" className="bg-gray-800">Spanish</option>
+              </select>
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            <input
+              type="text"
+              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              placeholder="Referral Code (Optional)"
+            />
+
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
+            >
+              {loading ? "Processing..." : "Sign Up"}
+            </button>
+          </div>
+
+          <div className="text-center mt-6">
+            <p className="text-white/80">
+              Already have an account?{' '}
+              <span className="text-cyan-400 font-medium cursor-pointer hover:text-cyan-300">
+                Log in here.
+              </span>
+            </p>
+          </div>
+
+          {/* Log output */}
+          {log && (
+            <div className="mt-4 p-3 bg-black/30 rounded-lg text-white text-sm text-center backdrop-blur-sm">
+              {log}
+            </div>
+          )}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Signup
+export default Signup;

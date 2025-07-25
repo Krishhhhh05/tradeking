@@ -63,8 +63,8 @@ const WithdrawalInterface = () => {
               <p className="text-slate-300 ">Fast And Secure Transactions</p>
             </div>
           </div>
-          <div className="flex flex-col w-20 items-center">
-            <img src="/eth.png" />
+          <div className="flex flex-col w-20 p-2 items-center">
+            <img src="/logo.png" />
           </div>
         </div>
         {/* Select Amount Card */}

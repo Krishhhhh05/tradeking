@@ -70,8 +70,8 @@ const WithdrawalInterface = () => {
         {/* Select Amount Card */}
         <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center">
-              <HiOutlineBanknotes />
+            <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
+              <HiOutlineBanknotes className="text-xl" />
             </div>
             <h2 className="text-white text-base font-semibold">
               SELECT AMOUNT

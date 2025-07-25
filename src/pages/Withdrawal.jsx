@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { HiOutlineBanknotes } from "react-icons/hi2";
 import { IoWallet, IoWalletOutline } from "react-icons/io5";
+import { MdVerifiedUser } from "react-icons/md";
 
 const WithdrawalInterface = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -128,40 +129,30 @@ const WithdrawalInterface = () => {
   );
 
   const renderUserVerification = () => (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 p-4">
-      <div className="max-w-sm mx-auto pt-8">
+    <div className="min-h-screen bg-slate-950 s-slate-900 p-4">
+      <div className="max-w-4xl mx-auto pt-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center space-x-3">
-            <div className="w-7 h-7 bg-indigo-600 rounded-md flex items-center justify-center">
-              <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                <span className="text-indigo-600 text-xs">✓</span>
-              </div>
+            <div className=" bg-violet-950 rounded-full p-3 flex items-center justify-center">
+              <MdVerifiedUser className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-white text-xl font-bold tracking-wide">
-                <span className="text-cyan-300">USER VERIFI</span>
-                <span className="text-pink-400">CATION</span>
+              <h1 className="text-3xl font-bold tracking-wide bg-gradient-to-r from-cyan-300 to-pink-400 bg-clip-text text-transparent">
+                USER VERIFICATION
               </h1>
-              <p className="text-slate-300 text-xs">
-                Fast And Secure Transactions
-              </p>
+              <p className="text-slate-300 ">Fast And Secure Transactions</p>
             </div>
           </div>
-          <div className="flex flex-col items-center">
-            <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-pink-500 rounded flex items-center justify-center mb-1">
-              <span className="text-white text-xs font-bold">T</span>
-            </div>
-            <span className="text-cyan-300 text-xs font-semibold">
-              TRADEBITS
-            </span>
+          <div className="flex flex-col w-20 p-2 items-center">
+            <img src="/logo.png" />
           </div>
         </div>
 
         {/* User Details Card */}
-        <div className="bg-slate-800/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
+        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 px-20 border border-slate-700/50">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
               <span className="text-slate-900 text-xs">👤</span>
             </div>
             <h2 className="text-white text-base font-semibold">USER DETAILS</h2>
@@ -195,13 +186,15 @@ const WithdrawalInterface = () => {
             </div>
           </div>
 
-          <button
-            onClick={handleVerify}
-            disabled={!userDetails.username || !userDetails.password}
-            className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg transition-colors text-sm"
-          >
-            Verify
-          </button>
+          <div className="flex justify-center">
+            <button
+              onClick={handleVerify}
+              disabled={!userDetails.username || !userDetails.password}
+              className="px-10 bg-pink-500 hover:bg-pink-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg transition-colors "
+            >
+              Verify
+            </button>
+          </div>
         </div>
       </div>
     </div>

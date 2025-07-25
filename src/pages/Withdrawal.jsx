@@ -86,7 +86,7 @@ const WithdrawalInterface = () => {
                 <button
                   key={amount}
                   onClick={() => handleAmountSelection(amount)}
-                  className={`h-14 rounded-md font-medium transition-all ${
+                  className={`h-14 rounded-md text-xs md:text-base font-medium transition-all ${
                     selectedAmount === amount
                       ? "bg-pink-500 text-white shadow-lg"
                       : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
@@ -150,7 +150,7 @@ const WithdrawalInterface = () => {
         </div>
 
         {/* User Details Card */}
-        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 px-20 border border-slate-700/50">
+        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 sm:px-20 border border-slate-700/50">
           <div className="flex items-center space-x-3 mb-6">
             <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
               <span className="text-slate-900 text-xs">👤</span>

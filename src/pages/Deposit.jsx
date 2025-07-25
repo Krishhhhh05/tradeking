@@ -85,7 +85,7 @@ const DepositInterface = () => {
                 <button
                   key={amount}
                   onClick={() => handleAmountSelection(amount)}
-                  className={`h-14 rounded-md font-medium transition-all ${
+                  className={`h-14 rounded-md font-medium text-xs md:text-base transition-all ${
                     selectedAmount === amount
                       ? "bg-pink-500 text-white shadow-lg"
                       : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
@@ -163,7 +163,7 @@ const DepositInterface = () => {
                     : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
                 }`}
               >
-                <div className="rounded-full p-3 w-16 h-16 flex justify-center items-center bg-violet-950 ">
+                <div className="rounded-full p-3 md:w-16 md:h-16 flex justify-center items-center bg-violet-950 ">
                   {method.icon}
                 </div>
                 <span className="font-medium">{method.label}</span>
@@ -276,15 +276,22 @@ const DepositInterface = () => {
             <p className="text-slate-300 text-sm mb-3">Pay Using</p>
             <div className="grid grid-cols-3 gap-3">
               {[
-                { name: "Gpay", color: "bg-green-600" },
-                { name: "PhonePe", color: "bg-purple-600" },
-                { name: "Paytm", color: "bg-blue-600" },
+                { name: "Gpay", image: "/gpay.png" },
+                { name: "PhonePe", image: "/phonepe.png" },
+                { name: "Paytm", image: "/paytm.png" },
               ].map((app) => (
                 <button
                   key={app.name}
-                  className={`${app.color} hover:opacity-80 text-white font-medium py-3 rounded-lg transition-opacity text-sm`}
+                  className="bg-slate-950 hover:bg-slate-700/50 border border-slate-600/50 text-white font-medium py-4 rounded-lg transition-all text-sm flex flex-col items-center space-y-2"
                 >
-                  {app.name}
+                  <div className="w-20 h-20 rounded-full overflow-hidden p-1">
+                    <img
+                      src={app.image}
+                      alt={app.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <span>{app.name}</span>
                 </button>
               ))}
             </div>

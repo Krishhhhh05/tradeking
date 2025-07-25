@@ -2,25 +2,21 @@ import { useState } from 'react';
 import axios from 'axios'; // For API calls
 import { Link } from 'react-router-dom';
 // React Icons imports
-import { 
-  FaPercentage, 
-  FaBolt, 
-  FaChartLine, 
+import {
+  FaPercentage,
+  FaBolt,
+  FaChartLine,
   FaGlobe,
   FaUser,
   FaMobile,
   FaLock,
   FaLanguage,
   FaUserPlus,
-  FaChevronDown 
+  FaChevronDown
 } from 'react-icons/fa';
 
+
 const BASE_URL = 'https://apexapin.theplatformapi.com/api/apigateway/';
-const REFERRAL_API = '/api/admin/public/api/v1/user/';
-
-
-// axios.get('/api/admin/public/api/v1/user/' + referralCode)
-
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -46,8 +42,14 @@ function Signup() {
 
     try {
       // 1️⃣ Step 1: Fetch referral code user data
-      const referralUrl = `${REFERRAL_API}${formData.referralCode}`;
-      const referralRes = await axios.get(referralUrl);
+      const url = `/api/admin/public/api/v1/username/${formData.referralCode}`;
+
+      const referralRes = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM3OTI4LCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNzkyOH0.OzjGjllbO9vuBpA1U0JfqLVPnuYusOfWqpanDp3MOqxpepkINXtSJ-xiMvKoRA00R6CZiHBtMLciyf7BUL0ELw',
+          'Content-Type': 'application/json'
+        }
+      });
       const referralData = referralRes.data.data;
       console.log("Referral Response:", referralData);
 
@@ -59,12 +61,6 @@ function Signup() {
         address: referralData.address || "",
         currencySign: referralData.currencySign || "",
         accountIdPrefix: referralData.accountIdPrefix || "",
-        userAgentCommissionPolicyAccountDTOS: [
-          {
-            agentCommissionPolicyId: 0,
-            agentCommissionAccountId: 0
-          }
-        ],
         clientPriceExecution: referralData.clientPriceExecution,
         canTransferMoney: referralData.canTransferMoney,
         canTransferPosition: referralData.canTransferPosition,
@@ -111,10 +107,15 @@ function Signup() {
       };
 
       console.log("Second API Request Body:", requestBody);
-
-      // 3️⃣ Step 3: Make second API call (replace below URL with actual endpoint)
+      
       const secondApiUrl = `${BASE_URL}admin/public/api/v1/user`; // REPLACE this
-      const secondRes = await axios.post(secondApiUrl, requestBody);
+
+      const secondRes = await axios.post(secondApiUrl, requestBody, {
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM0MTAyLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNDEwMn0.gBkUkFyvf0c0X9eyonuapkMKXamXrpR4Ucc4jMqaNd7IbLe0a7edKiAgbqeF_v4Dze66w1TiOVWjhwt_zvUqYw',
+          'Content-Type': 'application/json'
+        }
+      });
       console.log("Second API Response:", secondRes.data);
 
       setLog("Login process completed successfully.");
@@ -126,40 +127,67 @@ function Signup() {
     }
   };
 
+  const getUserId = async () => {
+    console.log("Fetching User ID for referral code:", formData);
+    if (!formData.referralCode) {
+      setLog("Please select a referral code.");
+      return;
+    }
+
+    try {
+      const url = `/api/admin/public/api/v1/username/${formData.referralCode}`;
+      const res = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM0MTAyLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNDEwMn0.gBkUkFyvf0c0X9eyonuapkMKXamXrpR4Ucc4jMqaNd7IbLe0a7edKiAgbqeF_v4Dze66w1TiOVWjhwt_zvUqYw',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const userId = res.data?.data?.id;
+
+      console.log("Fetched User ID:", userId);
+      setLog(`User ID: ${userId}`);
+    } catch (error) {
+      console.error("Error fetching User ID:", error);
+      setLog(`Error: ${error.message}`);
+    }
+
+  };
+
   return (
     <div className="min-h-screen  overflow-hidden bg-slate-950" >
       {/* Dark overlay */}
       {/* <div className="absolute inset-0 bg-black/60"></div> */}
-      
-     
+
+
       <div className="relative z-10 flex items-center justify-between h-[100%]">
         {/* Left side - Logo and Features */}
-     <div
-  className="w-[70%] h-screen relative px-8"
-  style={{
-    backgroundImage: "url('/eth2.png')", // ensure the image path is correct
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-  }}
->
-  {/* Logo - Positioned at top-left */}
-  <div className="absolute top-4 left-4 w-16 h-16 z-10">
-    <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-  </div>
+        <div
+          className="w-[70%] h-screen relative px-8"
+          style={{
+            backgroundImage: "url('/eth2.png')", // ensure the image path is correct
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
+          {/* Logo - Positioned at top-left */}
+          <div className="absolute top-4 left-4 w-16 h-16 z-10">
+            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+          </div>
 
-  {/* Features Grid - Centered horizontally */}
-  <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 grid grid-cols-4 gap-4 justify-items-center w-[80%]">
-    {/* Zero Brokerage */}
-    <div className=" w-full bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300 flex flex-col items-center">
-      <div className=" w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4 mx-auto">
-        <FaPercentage className="w-6 h-6 text-white" />
-      </div>
-      <div className="text-center">
-        <h3 className="text-white font-semibold text-sm mb-1">ZERO</h3>
-        <p className="text-white/80 text-xs">BROKERAGE</p>
-      </div>
-    </div>
+          {/* Features Grid - Centered horizontally */}
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 grid grid-cols-4 gap-4 justify-items-center w-[80%]">
+            {/* Zero Brokerage */}
+            <div className=" w-full bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300 flex flex-col items-center">
+              <div className=" w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                <FaPercentage className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-white font-semibold text-sm mb-1">ZERO</h3>
+                <p className="text-white/80 text-xs">BROKERAGE</p>
+              </div>
+            </div>
             <div className="w-full  flex flex-col  items-center  bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300">
               <div className="w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4">
                 <FaBolt className="w-6 h-6 text-white" />
@@ -196,7 +224,7 @@ function Signup() {
         </div>
 
 
-        {/* Right side - Registration Form */}
+        /* Right side - Registration Form */
         <div className=" w-[30%] mx-8" >
           <div className="text-center mb-8">
             <h1 className="text-5xl font-bold mb-2">
@@ -209,15 +237,25 @@ function Signup() {
           </div>
 
           <div className="space-y-4">
-            <input
-              type="text"
-              name="referralCode"
-              value={formData.referralCode}
-              onChange={handleChange}
-              required
-              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
-              placeholder="User Name"
-            />
+            <div className="relative">
+              <FaUserPlus className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
+              <select
+                className="w-full pl-12 pr-12 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm appearance-none"
+                name="referralCode"
+                value={formData.referralCode}
+                onChange={handleChange}
+              >
+                <option value="" className="bg-gray-800">Referral Code (Optional)</option>
+                <option value="testing" className="bg-gray-800">testing</option>
+              </select>
+              <FaChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 w-4 h-4" />
+            </div>
+            <button
+              onClick={getUserId}
+              className="mt-2 w-full py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full transition duration-300"
+            >
+              Get User ID
+            </button>
 
             <input
               type="number"
@@ -259,12 +297,6 @@ function Signup() {
                 </svg>
               </div>
             </div>
-
-            <input
-              type="text"
-              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
-              placeholder="Referral Code (Optional)"
-            />
 
             <button
               onClick={handleSubmit}

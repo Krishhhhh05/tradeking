@@ -82,7 +82,7 @@ function Signup() {
         mobile: "",
         parentId: referralData.id,
         password: formData.password, // From user input
-        secondPassword: "",
+        secondPassword: formData.password,
         investorPassword: "",
         percentageLevel1: referralData.percentageLevel1,
         percentageLevel2: referralData.percentageLevel2,

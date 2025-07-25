@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { CgArrowRight } from "react-icons/cg";
 import { HiOutlineBanknotes } from "react-icons/hi2";
 import { IoWalletOutline } from "react-icons/io5";
@@ -8,8 +8,8 @@ import {
   MdVerifiedUser,
 } from "react-icons/md";
 import { RiBankFill } from "react-icons/ri";
-import { useAuth } from '../AuthProvider'; // Adjust path
-
+import { useAuth } from "../AuthProvider"; // Adjust path
+import axios from "axios";
 
 const DepositInterface = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -18,13 +18,7 @@ const DepositInterface = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [utrReference, setUtrReference] = useState("");
   const [availableBanks, setAvailableBanks] = useState([]);
-
-  const [bankDetails, setBankDetails] = useState({
-    bankName: "",
-    accountNumber: "",
-    ifscCode: "",
-  });
-
+  const [selectedBankId, setSelectedBankId] = useState(0);
   const quickAmounts = [500, 1000, 5000, 10000, 50000];
   const { userData, token } = useAuth(); // Use the AuthProvider context
   console.log("User Data:", userData);
@@ -42,9 +36,128 @@ const DepositInterface = () => {
     }
   }, [userData]);
 
+  useEffect(() => {
+    const fetchBankDetails = async () => {
+      if (selectedPaymentMethod === "bank" && token) {
+        try {
+          const response = await fetch(`/api/admin/public/api/v1/bank`, {
+            // const response = await fetch(`${BASE_URL}admin/public/api/v1/bank`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log("Bank Details Fetched:", data.data);
+          const enabledBanks = data.data.filter((bank) => bank.enable === true);
+          const parentId = userData.parentId;
+          const parentEnabledBanks = enabledBanks.filter(
+            (bank) => bank.officeIds && bank.officeIds.includes(parentId)
+          );
+          setAvailableBanks(parentEnabledBanks);
+          console.log("Enabled Banks:", enabledBanks);
+          // You can store it in state here if needed
+        } catch (error) {
+          console.error("Error fetching bank details:", error);
+        }
+      }
+    };
+
+    fetchBankDetails();
+  }, [selectedPaymentMethod, token]);
+
+  const parseBankDetails = (details) => {
+    const cleaned = details.replace(/\r/g, "").split("\n").filter(Boolean);
+    const obj = {};
+    cleaned.forEach((line) => {
+      let key, value;
+
+      // Special handling for IFSC which uses "-" as separator
+      if (line.toLowerCase().includes("ifsc")) {
+        [key, value] = line.split("-").map((s) => s.trim());
+      } else {
+        [key, value] = line.split(":").map((s) => s.trim());
+      }
+
+      if (key && value) {
+        if (key.toLowerCase().includes("account name")) obj.accountName = value;
+        else if (key.toLowerCase().includes("account number"))
+          obj.accountNumber = value;
+        else if (key.toLowerCase().includes("ifsc")) obj.ifsc = value;
+        else if (key.toLowerCase().includes("branch")) obj.branch = value;
+        else if (key.toLowerCase().includes("upi")) obj.upi = value;
+      }
+    });
+    return obj;
+  };
+
+  const handleBankPaymentSubmit = () => {
+    let data = JSON.stringify({
+      amount: selectedAmount || customAmount,
+      bankId: selectedBankId,
+      comment: utrReference,
+      userId: userData.userId,
+    });
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "/api/admin/public/api/v1/depositRequest",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      data: data,
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleUpiPaymentSubmit = () => {
+    let data = JSON.stringify({
+      amount: selectedAmount || customAmount,
+      bankId: selectedBankId,
+      comment: utrReference,
+      userId: userData.userId,
+    });
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "/api/admin/public/api/v1/depositRequest",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      data: data,
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const handleAmountSelection = (amount) => {
     setSelectedAmount(amount);
-    setCustomAmount("");
+    setCustomAmount(null);
   };
 
   const handleCustomAmountChange = (e) => {
@@ -54,13 +167,6 @@ const DepositInterface = () => {
 
   const handlePaymentMethodSelect = (method) => {
     setSelectedPaymentMethod(method);
-  };
-
-  const handleBankDetailsChange = (field, value) => {
-    setBankDetails((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
   };
 
   const getSelectedAmountValue = () => {
@@ -250,16 +356,47 @@ const DepositInterface = () => {
           ))}
         </div>
 
-        {/* Amount Display */}
-        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 text-center border border-slate-700/50">
-          <p className="text-slate-300 text-sm mb-2">AMOUNT</p>
-          <p className="text-white text-xl font-bold">
-            ₹ {getSelectedAmountValue()}
-          </p>
-          <div className="w-32 h-32 bg-slate-900/80 rounded-lg mx-auto mt-4 flex items-center justify-center border border-slate-700/50">
-            <span className="text-slate-400 text-xs">QR CODE</span>
+        {/* Amount Display with Bank Details */}
+        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border border-slate-700/50">
+          <div className="text-center mb-4">
+            <p className="text-slate-300 text-sm mb-2">AMOUNT</p>
+            <p className="text-white text-xl font-bold">
+              ₹ {getSelectedAmountValue()}
+            </p>
           </div>
-          <p className="text-slate-400 text-xs mt-2">UPI ID</p>
+
+          {/* Bank Selection */}
+          <div className="mb-6"></div>
+          <p className="text-slate-300 text-sm mb-3">Select Bank</p>
+          <div className="grid md:grid-cols-2 gap-3">
+            {availableBanks.map((bank) => (
+              <div
+                key={bank.id}
+                onClick={() => setSelectedBankId(bank.id)}
+                className={`relative bg-slate-900/80 rounded-lg border cursor-pointer transition-all overflow-hidden ${
+                  selectedBankId === bank.id
+                    ? "border-pink-500 bg-pink-500/10"
+                    : "border-slate-700/50 hover:border-slate-600"
+                }`}
+              >
+                <div className="w-full h-64 flex items-center justify-center p-4">
+                  <img
+                    src={bank.bankImageUrl}
+                    alt={bank.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="p-2 text-center">
+                  <p className="text-white text-sm font-medium">{bank.name}</p>
+                </div>
+                {selectedBankId === bank.id && (
+                  <div className="absolute top-2 right-2">
+                    <MdVerifiedUser className="text-pink-500 text-xl" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Payment Confirmation */}
@@ -285,7 +422,10 @@ const DepositInterface = () => {
                 onChange={(e) => setUtrReference(e.target.value)}
                 className="flex-1 bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-l-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
               />
-              <button className="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-lg transition-colors">
+              <button
+                onClick={handleUpiPaymentSubmit}
+                className="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-lg transition-colors"
+              >
                 <CgArrowRight className="text-xl" />
               </button>
             </div>
@@ -301,9 +441,9 @@ const DepositInterface = () => {
               ].map((app) => (
                 <button
                   key={app.name}
-                  className="bg-slate-950 hover:bg-slate-700/50 border border-slate-600/50 text-white font-medium py-4 rounded-lg transition-all text-sm flex flex-col items-center space-y-2"
+                  className="bg-slate-950 hover:bg-slate-700/50 border border-slate-600/50 text-white font-medium py-4 rounded-lg transition-all text-sm flex flex-col items-center justify-between space-y-2"
                 >
-                  <div className="w-20 h-20 rounded-full overflow-hidden p-1">
+                  <div className="md:w-20 md:h-20 rounded-full overflow-hidden p-1">
                     <img
                       src={app.image}
                       alt={app.name}
@@ -319,55 +459,7 @@ const DepositInterface = () => {
       </div>
     </div>
   );
-useEffect(() => {
-  const fetchBankDetails = async () => {
-    if (selectedPaymentMethod === "bank" && token) {
-      try {
-        const response = await fetch(`/api/admin/public/api/v1/bank`, {
 
-        // const response = await fetch(`${BASE_URL}admin/public/api/v1/bank`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('Bank Details Fetched:', data.data);
-          const enabledBanks = data.data.filter(bank => bank.enable === true);
-        setAvailableBanks(enabledBanks);
-        console.log('Enabled Banks:', enabledBanks);
-        // You can store it in state here if needed
-      } catch (error) {
-        console.error('Error fetching bank details:', error);
-      }
-    }
-  };
- 
-
-
-  fetchBankDetails();
-}, [selectedPaymentMethod, token]);
- const parseBankDetails = (details) => {
-  const cleaned = details.replace(/\r/g, '').split('\n').filter(Boolean);
-  const obj = {};
-  cleaned.forEach(line => {
-    const [key, value] = line.split(' :').map(s => s.trim());
-    if (key && value) {
-      if (key.toLowerCase().includes('account name')) obj.accountName = value;
-      else if (key.toLowerCase().includes('account number')) obj.accountNumber = value;
-      else if (key.toLowerCase().includes('ifsc')) obj.ifsc = value;
-      else if (key.toLowerCase().includes('branch')) obj.branch = value;
-      else if (key.toLowerCase().includes('upi')) obj.upi = value;
-    }
-  });
-  return obj;
-};
   const renderBankPayment = () => (
     <div className="min-h-screen bg-slate-950 p-4 pb-20">
       <div className="max-w-4xl mx-auto pt-8">
@@ -415,72 +507,46 @@ useEffect(() => {
           ))}
         </div>
 
-        {/* Bank Details */}
-        {/* Render Available Banks */}
-{availableBanks.length > 0 ? (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {availableBanks.map((bank) => {
-      const parsed = parseBankDetails(bank.details);
-      return (
-        <div key={bank.id} className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-col space-y-3">
-          <div className="flex items-center space-x-4">
-            <img src={bank.bankImageUrl} alt={bank.name} className="w-16 h-16 object-cover rounded" />
-            <div>
-              <h3 className="text-white font-semibold text-lg">{bank.name}</h3>
-              <p className="text-slate-400 text-sm">{parsed.branch || 'Branch Info Unavailable'}</p>
-            </div>
-          </div>
-          <div className="text-sm text-slate-300 space-y-1">
-            <p><span className="font-semibold text-white">Account Name:</span> {parsed.accountName || 'N/A'}</p>
-            <p><span className="font-semibold text-white">Account Number:</span> {parsed.accountNumber || 'N/A'}</p>
-            <p><span className="font-semibold text-white">IFSC:</span> {parsed.ifsc || 'N/A'}</p>
-            {parsed.upi && <p><span className="font-semibold text-white">UPI:</span> {parsed.upi}</p>}
-          </div>
-        </div>
-      );
-    })}
-  </div>
-) : (
-  <p className="text-slate-400">No available banks at this time.</p>
-)}
+        {availableBanks.map((bank) => {
+          const parsed = parseBankDetails(bank.details);
 
-        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border border-slate-700/50">
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
-              <RiBankFill className="text-xl " />
+          return (
+            <div
+              key={bank.id}
+              onClick={() => setSelectedBankId(bank.id)}
+              className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${
+                selectedBankId === bank.id
+                  ? "border-pink-500 bg-pink-500/10"
+                  : "border-slate-700/50 hover:border-slate-600"
+              }`}
+            >
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
+                  <RiBankFill className="text-xl " />
+                </div>
+                <h2 className="text-white text-base font-semibold">
+                  BANK DETAILS
+                </h2>
+                {selectedBankId === bank.id && (
+                  <div className="ml-auto">
+                    <MdVerifiedUser className="text-pink-500 text-xl" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-4">
+                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
+                  {bank.name}
+                </div>
+                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
+                  {parsed.accountNumber}
+                </div>
+                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
+                  {parsed.ifsc}
+                </div>
+              </div>
             </div>
-            <h2 className="text-white text-base font-semibold">BANK DETAILS</h2>
-          </div>
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Bank Name"
-              value={bankDetails.bankName}
-              onChange={(e) =>
-                handleBankDetailsChange("bankName", e.target.value)
-              }
-              className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
-            />
-            <input
-              type="text"
-              placeholder="Account Number"
-              value={bankDetails.accountNumber}
-              onChange={(e) =>
-                handleBankDetailsChange("accountNumber", e.target.value)
-              }
-              className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
-            />
-            <input
-              type="text"
-              placeholder="IFSC Code"
-              value={bankDetails.ifscCode}
-              onChange={(e) =>
-                handleBankDetailsChange("ifscCode", e.target.value)
-              }
-              className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
-            />
-          </div>
-        </div>
+          );
+        })}
 
         {/* Payment Confirmation */}
         <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
@@ -504,7 +570,10 @@ useEffect(() => {
                 onChange={(e) => setUtrReference(e.target.value)}
                 className="flex-1 bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-l-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
               />
-              <button className="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-lg transition-colors">
+              <button
+                onClick={handleBankPaymentSubmit}
+                className="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-lg transition-colors"
+              >
                 <CgArrowRight className="text-xl" />
               </button>
             </div>

@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import axios from 'axios'; // For API calls
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import axios from "axios"; // For API calls
+import { Link } from "react-router-dom";
 // React Icons imports
 import {
   FaPercentage,
@@ -12,23 +12,21 @@ import {
   FaLock,
   FaLanguage,
   FaUserPlus,
-  FaChevronDown
-} from 'react-icons/fa';
-import { useAuth } from '../AuthProvider'; // Adjust path
+  FaChevronDown,
+} from "react-icons/fa";
+import { useAuth } from "../AuthProvider"; // Adjust path
 
 // Inside your component
 
-
-
-const BASE_URL = 'https://apexapin.theplatformapi.com/api/apigateway/';
+const BASE_URL = "https://apexapin.theplatformapi.com/api/apigateway/";
 
 function Signup() {
-  const { login,token } = useAuth();
+  const { login, token } = useAuth();
 
   const [formData, setFormData] = useState({
-    mobile: '',
-    password: '',
-    referralCode: '', // New input for referral code
+    mobile: "",
+    password: "",
+    referralCode: "", // New input for referral code
   });
 
   const [loading, setLoading] = useState(false);
@@ -37,7 +35,7 @@ function Signup() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -52,9 +50,9 @@ function Signup() {
 
       const referralRes = await axios.get(url, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
       const referralData = referralRes.data.data;
       console.log("Referral Response:", referralData);
@@ -62,7 +60,8 @@ function Signup() {
       // 2️⃣ Step 2: Prepare second API request body
       const requestBody = {
         accountID: -1,
-        accountMirroringAccountIds: referralData.accountMirroringAccountIds || [],
+        accountMirroringAccountIds:
+          referralData.accountMirroringAccountIds || [],
         accountMirroringPolicyId: -1,
         address: referralData.address || "",
         currencySign: referralData.currencySign || "",
@@ -81,7 +80,7 @@ function Signup() {
         isLocked: referralData.locked,
         lastName: "",
         mobile: "",
-        parentId: referralData.parentId,
+        parentId: referralData.id,
         password: formData.password, // From user input
         secondPassword: "",
         investorPassword: "",
@@ -113,42 +112,28 @@ function Signup() {
       };
 
       console.log("Second API Request Body:", requestBody);
-      
+
       const secondApiUrl = `${BASE_URL}admin/public/api/v1/user`; // REPLACE this
 
       const secondRes = await axios.post(secondApiUrl, requestBody, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
       console.log("Second API Response:", secondRes.data);
 
       setLog("Login process completed successfully.");
-      
-const userData = secondRes.data?.data; // Assuming response contains user data
-// const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM0MTAyLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNDEwMn0.gBkUkFyvf0c0X9eyonuapkMKXamXrpR4Ucc4jMqaNd7IbLe0a7edKiAgbqeF_v4Dze66w1TiOVWjhwt_zvUqYw';
 
-// Save to localStorage
-// localStorage.setItem('userData', JSON.stringify(userData));
-// localStorage.setItem('token', token);
-login(userData, token); // Use the login function from AuthProvider
-// Set up heartbeat interval
-setInterval(async () => {
-  try {
-    const heartbeatRes = await axios.get('/api/admin/public/api/v1/heartbeat', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    console.log("Heartbeat success:", heartbeatRes.data);
-  } catch (err) {
-    console.error("Heartbeat failed:", err);
-  }
-}, 10 * 60 * 1000); // 10 minutes
+      const userData = secondRes.data?.data; // Assuming response contains user data
+      // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM0MTAyLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNDEwMn0.gBkUkFyvf0c0X9eyonuapkMKXamXrpR4Ucc4jMqaNd7IbLe0a7edKiAgbqeF_v4Dze66w1TiOVWjhwt_zvUqYw';
 
-setLog("User signed up and logged in successfully.");
+      // Save to localStorage
+      // localStorage.setItem('userData', JSON.stringify(userData));
+      // localStorage.setItem('token', token);
+      login(userData); // Use the login function from AuthProvider
+
+      setLog("User signed up and logged in successfully.");
     } catch (error) {
       console.error("Error during login process:", error);
       setLog(`Error: ${error.message}`);
@@ -168,9 +153,9 @@ setLog("User signed up and logged in successfully.");
       const url = `/api/admin/public/api/v1/username/${formData.referralCode}`;
       const res = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM0MTAyLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNDEwMn0.gBkUkFyvf0c0X9eyonuapkMKXamXrpR4Ucc4jMqaNd7IbLe0a7edKiAgbqeF_v4Dze66w1TiOVWjhwt_zvUqYw',
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
       const userId = res.data?.data?.id;
@@ -181,14 +166,12 @@ setLog("User signed up and logged in successfully.");
       console.error("Error fetching User ID:", error);
       setLog(`Error: ${error.message}`);
     }
-
   };
 
   return (
-    <div className="min-h-screen  overflow-hidden bg-slate-950" >
+    <div className="min-h-screen  overflow-hidden bg-slate-950">
       {/* Dark overlay */}
       {/* <div className="absolute inset-0 bg-black/60"></div> */}
-
 
       <div className="relative z-10 flex items-center justify-between h-[100%]">
         {/* Left side - Logo and Features */}
@@ -196,14 +179,18 @@ setLog("User signed up and logged in successfully.");
           className="w-[70%] h-screen relative px-8"
           style={{
             backgroundImage: "url('/eth2.png')", // ensure the image path is correct
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           }}
         >
           {/* Logo - Positioned at top-left */}
           <div className="absolute top-4 left-4 w-16 h-16 z-10">
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
 
           {/* Features Grid - Centered horizontally */}
@@ -223,7 +210,9 @@ setLog("User signed up and logged in successfully.");
                 <FaBolt className="w-6 h-6 text-white" />
               </div>
               <div className="text-center">
-                <h3 className="text-white font-semibold text-sm mb-1">INSTANT</h3>
+                <h3 className="text-white font-semibold text-sm mb-1">
+                  INSTANT
+                </h3>
                 <p className="text-white/80 text-xs">PAYOUTS</p>
               </div>
             </div>
@@ -245,17 +234,17 @@ setLog("User signed up and logged in successfully.");
                 <FaGlobe className="w-6 h-6 text-white" />
               </div>
               <div className="text-center">
-                <h3 className="text-white font-semibold text-sm mb-1">INDIAN &</h3>
+                <h3 className="text-white font-semibold text-sm mb-1">
+                  INDIAN &
+                </h3>
                 <p className="text-white/80 text-xs">INTERNATIONAL</p>
                 <p className="text-white/80 text-xs">MARKETS</p>
               </div>
             </div>
           </div>
         </div>
-
-
         /* Right side - Registration Form */
-        <div className=" w-[30%] mx-8" >
+        <div className=" w-[30%] mx-8">
           <div className="text-center mb-8">
             <h1 className="text-5xl font-bold mb-2">
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
@@ -275,10 +264,15 @@ setLog("User signed up and logged in successfully.");
                 value={formData.referralCode}
                 onChange={handleChange}
               >
-                <option value="" className="bg-gray-800">Referral Code (Optional)</option>
-                <option value="testing" className="bg-gray-800">testing</option>
-                <option value="11111" className="bg-gray-800">11111</option>
-
+                <option value="" className="bg-gray-800">
+                  Referral Code (Optional)
+                </option>
+                <option value="testing" className="bg-gray-800">
+                  testing
+                </option>
+                <option value="11111" className="bg-gray-800">
+                  11111
+                </option>
               </select>
               <FaChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 w-4 h-4" />
             </div>
@@ -318,14 +312,32 @@ setLog("User signed up and logged in successfully.");
 
             <div className="relative">
               <select className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm appearance-none">
-                <option value="" className="bg-gray-800">RM Support Language</option>
-                <option value="english" className="bg-gray-800">English</option>
-                <option value="hindi" className="bg-gray-800">Hindi</option>
-                <option value="spanish" className="bg-gray-800">Spanish</option>
+                <option value="" className="bg-gray-800">
+                  RM Support Language
+                </option>
+                <option value="english" className="bg-gray-800">
+                  English
+                </option>
+                <option value="hindi" className="bg-gray-800">
+                  Hindi
+                </option>
+                <option value="spanish" className="bg-gray-800">
+                  Spanish
+                </option>
               </select>
               <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </div>
             </div>
@@ -341,7 +353,7 @@ setLog("User signed up and logged in successfully.");
 
           <div className="text-center mt-6">
             <p className="text-white/80">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <span className="text-cyan-400 font-medium cursor-pointer hover:text-cyan-300">
                 Log in here.
               </span>

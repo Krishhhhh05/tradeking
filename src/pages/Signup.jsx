@@ -115,7 +115,7 @@ function Signup() {
 
   return (
     <div className="min-h-screen relative overflow-hidden" style={{
-      backgroundImage: "url('/eth.png')",
+      backgroundImage: "url('/eth2.png')",
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat'

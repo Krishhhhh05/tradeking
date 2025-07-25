@@ -5,11 +5,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Proxy all API requests starting with /api to the real API
       '/api': {
         target: 'https://apexapin.theplatformapi.com/api/apigateway',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '') // Remove /api prefix
+        secure: true, // Ensure HTTPS is used properly
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }

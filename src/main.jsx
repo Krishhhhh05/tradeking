@@ -7,10 +7,13 @@ import Login from './pages/Login.jsx'
 import Deposit from './pages/Deposit.jsx'
 import Signup from './pages/Signup.jsx'
 import Withdrawal from './pages/Withdrawal.jsx'
+import { AuthProvider } from './AuthProvider'; // Adjust path accordingly
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
+        <AuthProvider>
+
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login />} />
@@ -19,6 +22,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/signup" element={<Signup />} />
 
       </Routes>
+              </AuthProvider>
+
     </BrowserRouter>
   </StrictMode>,
 )

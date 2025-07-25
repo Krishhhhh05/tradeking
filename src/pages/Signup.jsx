@@ -14,11 +14,17 @@ import {
   FaUserPlus,
   FaChevronDown
 } from 'react-icons/fa';
+import { useAuth } from '../AuthProvider'; // Adjust path
+
+// Inside your component
+
 
 
 const BASE_URL = 'https://apexapin.theplatformapi.com/api/apigateway/';
 
 function Signup() {
+  const { login,token } = useAuth();
+
   const [formData, setFormData] = useState({
     mobile: '',
     password: '',
@@ -46,7 +52,7 @@ function Signup() {
 
       const referralRes = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM3OTI4LCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNzkyOH0.OzjGjllbO9vuBpA1U0JfqLVPnuYusOfWqpanDp3MOqxpepkINXtSJ-xiMvKoRA00R6CZiHBtMLciyf7BUL0ELw',
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -88,7 +94,7 @@ function Signup() {
         telephonePass: "",
         tradingType: referralData.tradingType,
         userCurrencyId: referralData.userCurrencyId,
-        userType: referralData.userType,
+        userType: 1,
         username: formData.mobile, // You can customize this logic
         validateMoneyBeforeClose: referralData.validateMoneyBeforeClose,
         validateMoneyBeforeEntry: referralData.validateMoneyBeforeEntry,
@@ -112,13 +118,37 @@ function Signup() {
 
       const secondRes = await axios.post(secondApiUrl, requestBody, {
         headers: {
-          'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM0MTAyLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNDEwMn0.gBkUkFyvf0c0X9eyonuapkMKXamXrpR4Ucc4jMqaNd7IbLe0a7edKiAgbqeF_v4Dze66w1TiOVWjhwt_zvUqYw',
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
       console.log("Second API Response:", secondRes.data);
 
       setLog("Login process completed successfully.");
+      
+const userData = secondRes.data?.data; // Assuming response contains user data
+// const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM0MTAyLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNDEwMn0.gBkUkFyvf0c0X9eyonuapkMKXamXrpR4Ucc4jMqaNd7IbLe0a7edKiAgbqeF_v4Dze66w1TiOVWjhwt_zvUqYw';
+
+// Save to localStorage
+// localStorage.setItem('userData', JSON.stringify(userData));
+// localStorage.setItem('token', token);
+login(userData, token); // Use the login function from AuthProvider
+// Set up heartbeat interval
+setInterval(async () => {
+  try {
+    const heartbeatRes = await axios.get('/api/admin/public/api/v1/heartbeat', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log("Heartbeat success:", heartbeatRes.data);
+  } catch (err) {
+    console.error("Heartbeat failed:", err);
+  }
+}, 10 * 60 * 1000); // 10 minutes
+
+setLog("User signed up and logged in successfully.");
     } catch (error) {
       console.error("Error during login process:", error);
       setLog(`Error: ${error.message}`);
@@ -247,6 +277,8 @@ function Signup() {
               >
                 <option value="" className="bg-gray-800">Referral Code (Optional)</option>
                 <option value="testing" className="bg-gray-800">testing</option>
+                <option value="11111" className="bg-gray-800">11111</option>
+
               </select>
               <FaChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 w-4 h-4" />
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { CgArrowRight } from "react-icons/cg";
 import { HiOutlineBanknotes } from "react-icons/hi2";
 import { IoWalletOutline } from "react-icons/io5";
@@ -8,6 +8,8 @@ import {
   MdVerifiedUser,
 } from "react-icons/md";
 import { RiBankFill } from "react-icons/ri";
+import { useAuth } from '../AuthProvider'; // Adjust path
+
 
 const DepositInterface = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -15,6 +17,8 @@ const DepositInterface = () => {
   const [customAmount, setCustomAmount] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [utrReference, setUtrReference] = useState("");
+  const [availableBanks, setAvailableBanks] = useState([]);
+
   const [bankDetails, setBankDetails] = useState({
     bankName: "",
     accountNumber: "",
@@ -22,6 +26,21 @@ const DepositInterface = () => {
   });
 
   const quickAmounts = [500, 1000, 5000, 10000, 50000];
+  const { userData, token } = useAuth(); // Use the AuthProvider context
+  console.log("User Data:", userData);
+  console.log("Token:", token);
+  const [clientId, setClientId] = useState(null);
+  const [officeId, setOfficeId] = useState(null);
+
+  // Update state when userData changes
+  useEffect(() => {
+    if (userData) {
+      setClientId(userData.accountId);
+      setOfficeId(userData.officeId);
+      console.log("Client ID:", clientId);
+      console.log("Office ID:", officeId);
+    }
+  }, [userData]);
 
   const handleAmountSelection = (amount) => {
     setSelectedAmount(amount);
@@ -300,7 +319,55 @@ const DepositInterface = () => {
       </div>
     </div>
   );
+useEffect(() => {
+  const fetchBankDetails = async () => {
+    if (selectedPaymentMethod === "bank" && token) {
+      try {
+        const response = await fetch(`/api/admin/public/api/v1/bank`, {
 
+        // const response = await fetch(`${BASE_URL}admin/public/api/v1/bank`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Bank Details Fetched:', data.data);
+          const enabledBanks = data.data.filter(bank => bank.enable === true);
+        setAvailableBanks(enabledBanks);
+        console.log('Enabled Banks:', enabledBanks);
+        // You can store it in state here if needed
+      } catch (error) {
+        console.error('Error fetching bank details:', error);
+      }
+    }
+  };
+ 
+
+
+  fetchBankDetails();
+}, [selectedPaymentMethod, token]);
+ const parseBankDetails = (details) => {
+  const cleaned = details.replace(/\r/g, '').split('\n').filter(Boolean);
+  const obj = {};
+  cleaned.forEach(line => {
+    const [key, value] = line.split(' :').map(s => s.trim());
+    if (key && value) {
+      if (key.toLowerCase().includes('account name')) obj.accountName = value;
+      else if (key.toLowerCase().includes('account number')) obj.accountNumber = value;
+      else if (key.toLowerCase().includes('ifsc')) obj.ifsc = value;
+      else if (key.toLowerCase().includes('branch')) obj.branch = value;
+      else if (key.toLowerCase().includes('upi')) obj.upi = value;
+    }
+  });
+  return obj;
+};
   const renderBankPayment = () => (
     <div className="min-h-screen bg-slate-950 p-4 pb-20">
       <div className="max-w-4xl mx-auto pt-8">
@@ -349,6 +416,34 @@ const DepositInterface = () => {
         </div>
 
         {/* Bank Details */}
+        {/* Render Available Banks */}
+{availableBanks.length > 0 ? (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {availableBanks.map((bank) => {
+      const parsed = parseBankDetails(bank.details);
+      return (
+        <div key={bank.id} className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-col space-y-3">
+          <div className="flex items-center space-x-4">
+            <img src={bank.bankImageUrl} alt={bank.name} className="w-16 h-16 object-cover rounded" />
+            <div>
+              <h3 className="text-white font-semibold text-lg">{bank.name}</h3>
+              <p className="text-slate-400 text-sm">{parsed.branch || 'Branch Info Unavailable'}</p>
+            </div>
+          </div>
+          <div className="text-sm text-slate-300 space-y-1">
+            <p><span className="font-semibold text-white">Account Name:</span> {parsed.accountName || 'N/A'}</p>
+            <p><span className="font-semibold text-white">Account Number:</span> {parsed.accountNumber || 'N/A'}</p>
+            <p><span className="font-semibold text-white">IFSC:</span> {parsed.ifsc || 'N/A'}</p>
+            {parsed.upi && <p><span className="font-semibold text-white">UPI:</span> {parsed.upi}</p>}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+) : (
+  <p className="text-slate-400">No available banks at this time.</p>
+)}
+
         <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border border-slate-700/50">
           <div className="flex items-center space-x-3 mb-6">
             <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">

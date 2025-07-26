@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { createContext, useState, useEffect, useContext } from "react";
 
 const AuthContext = createContext();
@@ -7,6 +8,18 @@ export const AuthProvider = ({ children }) => {
     "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNTAyMjIxLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzUwMjIyMX0.IIV77LV09t7udo4xhQ0UtS7LGAaGvfXLhCEG3LYDYM1c3KjQKxd-f5qHoXvLsWQfyknd_Ob5e-FaHR8XHdS4pg"
   );
   const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const handleLogin = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/get_token");
+        console.log(res.data);
+      } catch (err) {
+        console.log({ error: err });
+      }
+    };
+    handleLogin();
+  }, []);
 
   useEffect(() => {
     // const storedToken = localStorage.getItem('token');

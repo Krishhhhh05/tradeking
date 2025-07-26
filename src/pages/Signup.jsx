@@ -31,6 +31,8 @@ function Signup() {
 
   const [loading, setLoading] = useState(false);
   const [log, setLog] = useState(null); // For debugging logs/output
+  const [generatedOTP, setGeneratedOTP] = useState("");
+  const [enteredOTP, setEnteredOTP] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -142,29 +144,60 @@ function Signup() {
     }
   };
 
-  const getUserId = async () => {
-    console.log("Fetching User ID for referral code:", formData);
-    if (!formData.referralCode) {
-      setLog("Please select a referral code.");
-      return;
-    }
+  const generateRandomOTP = () => {
+    const otp = Math.floor(1000 + Math.random() * 9000); // 4-digit OTP
+    return otp.toString();
+  };
+
+  const [otpDisabled, setOtpDisabled] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+  const sendOTP = async () => {
+    const otp = generateRandomOTP();
+    setGeneratedOTP(otp);
+
+    const mobile = formData.mobile;
+
+    const message = `Dear Users,%0AYour user ID is active and use OTP ${otp}.%0AThank you for choosing us.%0AWe are happy to help you.%0AProfitVista`;
+
+    const apiUrl = `https://pgapi.smartping.ai/fe/api/v1/send?username=otpsmsgame.trans&password=Qwerty@123&unicode=false&from=PROFN&to=${mobile}&dltPrincipalEntityId=1701172415051608213&dltContentId=1707172467291922195&text=${message}`;
+    let response;
 
     try {
-      const url = `/api/admin/public/api/v1/username/${formData.referralCode}`;
-      const res = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const userId = res.data?.data?.id;
-
-      console.log("Fetched User ID:", userId);
-      setLog(`User ID: ${userId}`);
+      response = await axios.get(apiUrl);
+      console.log(response);
+      if (response.status === 200) {
+      } else {
+        setLog("Failed to send OTP.");
+      }
     } catch (error) {
-      console.error("Error fetching User ID:", error);
-      setLog(`Error: ${error.message}`);
+      console.log(response);
+      console.error("Error sending OTP:", error);
+      // setStatusMessage("Error sending OTP.");
+    }
+    setLog("OTP sent successfully!");
+
+    // Disable button for 30 seconds
+    setOtpDisabled(true);
+    setCountdown(30);
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setOtpDisabled(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const verifyOTP = () => {
+    if (enteredOTP === generatedOTP) {
+      setLog("OTP verified successfully!");
+    } else {
+      setLog("Invalid OTP. Please try again.");
     }
   };
 
@@ -194,97 +227,79 @@ function Signup() {
           </div>
 
           {/* Features Grid - Centered horizontally */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 grid grid-cols-4 gap-4 justify-items-center w-[80%]">
+          <div className="absolute bottom-8 grid grid-cols-4 gap-6 justify-items-center w-[85%] left-1/2 transform -translate-x-1/2">
             {/* Zero Brokerage */}
-            <div className=" w-full bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300 flex flex-col items-center">
-              <div className=" w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4 mx-auto">
-                <FaPercentage className="w-6 h-6 text-white" />
+            <div className="group w-full bg-gradient-to-br from-purple-900/50 to-purple-800/30 backdrop-blur-md border border-purple-400/30 rounded-3xl p-4 hover:bg-gradient-to-br hover:from-purple-800/60 hover:to-purple-700/40 transition-all duration-500 flex flex-col items-center hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-600/80 to-purple-500/60 rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:from-purple-500 group-hover:to-purple-400 transition-all duration-300 shadow-lg">
+                <FaPercentage className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
               <div className="text-center">
-                <h3 className="text-white font-semibold text-sm mb-1">ZERO</h3>
-                <p className="text-white/80 text-xs">BROKERAGE</p>
+                <h3 className="text-white font-semibold text-base mb-2 tracking-wide">
+                  ZERO BROKERAGE
+                </h3>
               </div>
             </div>
-            <div className="w-full  flex flex-col  items-center  bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300">
-              <div className="w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4">
-                <FaBolt className="w-6 h-6 text-white" />
+
+            {/* Instant Payouts */}
+            <div className="group w-full bg-gradient-to-br from-purple-900/50 to-purple-800/30 backdrop-blur-md border border-purple-400/30 rounded-3xl p-4 hover:bg-gradient-to-br hover:from-purple-800/60 hover:to-purple-700/40 transition-all duration-500 flex flex-col items-center hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-600/80 to-purple-500/60 rounded-2xl flex items-center justify-center mb-6 group-hover:from-purple-500 group-hover:to-purple-400 transition-all duration-300 shadow-lg">
+                <FaBolt className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
               <div className="text-center">
-                <h3 className="text-white font-semibold text-sm mb-1">
-                  INSTANT
+                <h3 className="text-white font-semibold text-base mb-2 tracking-wide">
+                  INSTANT PAYOUTS
                 </h3>
-                <p className="text-white/80 text-xs">PAYOUTS</p>
               </div>
             </div>
 
             {/* Up to 500x */}
-            <div className="w-full  flex flex-col items-center bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300">
-              <div className="w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4">
-                <FaChartLine className="w-6 h-6 text-white" />
+            <div className="group w-full bg-gradient-to-br from-purple-900/50 to-purple-800/30 backdrop-blur-md border border-purple-400/30 rounded-3xl p-4 hover:bg-gradient-to-br hover:from-purple-800/60 hover:to-purple-700/40 transition-all duration-500 flex flex-col items-center hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-600/80 to-purple-500/60 rounded-2xl flex items-center justify-center mb-6 group-hover:from-purple-500 group-hover:to-purple-400 transition-all duration-300 shadow-lg">
+                <FaChartLine className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
               <div className="text-center">
-                <h3 className="text-white font-semibold text-sm mb-1">UPTO</h3>
-                <p className="text-white/80 text-xs">500x</p>
+                <h3 className="text-white font-semibold text-base mb-2 tracking-wide">
+                  UPTO 500x
+                </h3>
               </div>
             </div>
 
             {/* Indian & International Markets */}
-            <div className="w-full  flex flex-col items-center bg-purple-900/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 hover:bg-purple-800/50 transition-all duration-300">
-              <div className="w-12 h-12 bg-purple-700/60 rounded-xl flex items-center justify-center mb-4">
-                <FaGlobe className="w-6 h-6 text-white" />
+            <div className="group w-full bg-gradient-to-br from-purple-900/50 to-purple-800/30 backdrop-blur-md border border-purple-400/30 rounded-3xl p-4 hover:bg-gradient-to-br hover:from-purple-800/60 hover:to-purple-700/40 transition-all duration-500 flex flex-col items-center hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-600/80 to-purple-500/60 rounded-2xl flex items-center justify-center mb-6 group-hover:from-purple-500 group-hover:to-purple-400 transition-all duration-300 shadow-lg">
+                <FaGlobe className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
               <div className="text-center">
-                <h3 className="text-white font-semibold text-sm mb-1">
-                  INDIAN &
+                <h3 className="text-white font-semibold text-base mb-2 tracking-wide">
+                  GLOBAL MARKETS
                 </h3>
-                <p className="text-white/80 text-xs">INTERNATIONAL</p>
-                <p className="text-white/80 text-xs">MARKETS</p>
               </div>
             </div>
           </div>
         </div>
-       
+
+        {/* Right side - Registration Form */}
         <div className=" w-[30%] mx-8">
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold mb-2">
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                REGISTER
-              </span>
-              <span className="text-pink-500 ml-2">HERE</span>
+            <h1 className="text-3xl font-bold tracking-wide bg-gradient-to-r from-cyan-300 to-pink-400 bg-clip-text text-transparent">
+              REGISTER HERE
             </h1>
-            <p className="text-white text-xl">Let's Get Started!</p>
+            <p className="text-white">Let's Get Started!</p>
           </div>
 
           <div className="space-y-4">
-            <div className="relative">
-              <FaUserPlus className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
-              <select
-                className="w-full pl-12 pr-12 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm appearance-none"
-                name="referralCode"
-                value={formData.referralCode}
-                onChange={handleChange}
-              >
-                <option value="" className="bg-gray-800">
-                  Referral Code (Optional)
-                </option>
-                <option value="testing" className="bg-gray-800">
-                  testing
-                </option>
-                <option value="11111" className="bg-gray-800">
-                  11111
-                </option>
-              </select>
-              <FaChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 w-4 h-4" />
-            </div>
-            <button
-              onClick={getUserId}
-              className="mt-2 w-full py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full transition duration-300"
-            >
-              Get User ID
-            </button>
+            <input
+              type="text"
+              name="referralCode"
+              value={formData.referralCode}
+              onChange={handleChange}
+              required
+              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              placeholder="Refferal Code"
+            />
 
             <input
-              type="number"
+              type="text"
               name="mobile"
               value={formData.mobile}
               onChange={handleChange}
@@ -292,6 +307,31 @@ function Signup() {
               className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
               placeholder="Mobile Number"
             />
+
+            <input
+              type="text"
+              placeholder="Enter OTP"
+              value={enteredOTP}
+              onChange={(e) => setEnteredOTP(e.target.value)}
+              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+            />
+            <div className="flex justify-center gap-8">
+              <button
+                disabled={otpDisabled}
+                onClick={sendOTP}
+                className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
+              >
+                Send OTP
+              </button>
+
+              <button
+                onClick={verifyOTP}
+                disabled={!formData.mobile || !enteredOTP}
+                className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
+              >
+                Verify
+              </button>
+            </div>
 
             <input
               type="password"
@@ -309,38 +349,6 @@ function Signup() {
               className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
               placeholder="Confirm Password"
             />
-
-            <div className="relative">
-              <select className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm appearance-none">
-                <option value="" className="bg-gray-800">
-                  RM Support Language
-                </option>
-                <option value="english" className="bg-gray-800">
-                  English
-                </option>
-                <option value="hindi" className="bg-gray-800">
-                  Hindi
-                </option>
-                <option value="spanish" className="bg-gray-800">
-                  Spanish
-                </option>
-              </select>
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
 
             <button
               onClick={handleSubmit}
@@ -362,7 +370,7 @@ function Signup() {
 
           {/* Log output */}
           {log && (
-            <div className="mt-4 p-3 bg-black/30 rounded-lg text-white text-sm text-center backdrop-blur-sm">
+            <div className="mt-4 p-3 bg-black/30 rounded-lg text-green-500 text-sm text-center backdrop-blur-sm">
               {log}
             </div>
           )}

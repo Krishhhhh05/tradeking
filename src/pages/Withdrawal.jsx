@@ -114,9 +114,15 @@ const WithdrawalInterface = () => {
       .request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
+        setStatusMessage(
+          response.data.message || "Withdrawal request submitted successfully"
+        );
       })
       .catch((error) => {
         console.log(error);
+        setStatusMessage(
+          error.response?.data?.message || error.message || "An error occurred"
+        );
       });
   };
 
@@ -128,6 +134,9 @@ const WithdrawalInterface = () => {
     const otp = Math.floor(1000 + Math.random() * 9000); // 4-digit OTP
     return otp.toString();
   };
+
+  const [otpDisabled, setOtpDisabled] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   const sendOTP = async () => {
     const otp = generateRandomOTP();
@@ -153,6 +162,21 @@ const WithdrawalInterface = () => {
       // setStatusMessage("Error sending OTP.");
     }
     setStatusMessage("OTP sent successfully!");
+
+    // Disable button for 30 seconds
+    setOtpDisabled(true);
+    setCountdown(30);
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setOtpDisabled(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const verifyOTP = () => {
@@ -289,14 +313,7 @@ const WithdrawalInterface = () => {
                 }
                 className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
               />
-              <div className="flex justify-center">
-                <button
-                  onClick={sendOTP}
-                  className="px-10 bg-pink-600 hover:bg-pink-700 text-white font-bold py-2  rounded-lg"
-                >
-                  Send OTP
-                </button>
-              </div>
+
               <input
                 type="text"
                 placeholder="Enter OTP"
@@ -305,11 +322,19 @@ const WithdrawalInterface = () => {
                 className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
               />
 
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-8">
                 <button
-                  onClick={handleVerify}
+                  disabled={otpDisabled}
+                  onClick={sendOTP}
+                  className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
+                >
+                  Send OTP
+                </button>
+
+                <button
+                  onClick={verifyOTP}
                   disabled={!userDetails.mobile || !enteredOTP}
-                  className="px-10 bg-pink-500 hover:bg-pink-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg transition-colors "
+                  className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
                 >
                   Verify
                 </button>

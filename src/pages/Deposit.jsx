@@ -25,6 +25,7 @@ const DepositInterface = () => {
   console.log("Token:", token);
   const [clientId, setClientId] = useState(null);
   const [officeId, setOfficeId] = useState(null);
+  const [status, setStatus] = useState("");
 
   // Update state when userData changes
   useEffect(() => {
@@ -38,7 +39,10 @@ const DepositInterface = () => {
 
   useEffect(() => {
     const fetchBankDetails = async () => {
-      if (selectedPaymentMethod === "bank" && token) {
+      if (
+        (selectedPaymentMethod === "bank" || selectedPaymentMethod === "upi") &&
+        token
+      ) {
         try {
           const response = await fetch(`/api/admin/public/api/v1/bank`, {
             // const response = await fetch(`${BASE_URL}admin/public/api/v1/bank`, {
@@ -120,9 +124,13 @@ const DepositInterface = () => {
       .request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
+        setStatus(response.data.message);
       })
       .catch((error) => {
         console.log(error);
+        setStatus(
+          error.response?.data?.message || error.message || "An error occurred"
+        );
       });
   };
 
@@ -149,9 +157,13 @@ const DepositInterface = () => {
       .request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
+        setStatus(response.data.message);
       })
       .catch((error) => {
         console.log(error);
+        setStatus(
+          error.response?.data?.message || error.message || "An error occurred"
+        );
       });
   };
 
@@ -236,7 +248,7 @@ const DepositInterface = () => {
               />
             </div>
           </div>
-          <div className="flex justify-center">
+          {/* <div className="flex justify-center">
             <button
               onClick={() => setCurrentStep(2)}
               disabled={!getSelectedAmountValue()}
@@ -244,7 +256,7 @@ const DepositInterface = () => {
             >
               Continue
             </button>
-          </div>
+          </div> */}
         </div>
         {/* Payment Method Card */}
         <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
@@ -430,6 +442,11 @@ const DepositInterface = () => {
               </button>
             </div>
           </div>
+          {status && (
+            <div className="mt-4 text-center text-white font-semibold">
+              {status}
+            </div>
+          )}
 
           <div>
             <p className="text-slate-300 text-sm mb-3">Pay Using</p>
@@ -578,6 +595,11 @@ const DepositInterface = () => {
               </button>
             </div>
           </div>
+          {status && (
+            <div className="mt-4 text-center text-white font-semibold">
+              {status}
+            </div>
+          )}
         </div>
       </div>
     </div>

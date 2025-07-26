@@ -243,7 +243,7 @@ function Signup() {
             </div>
           </div>
         </div>
-        /* Right side - Registration Form */
+       
         <div className=" w-[30%] mx-8">
           <div className="text-center mb-8">
             <h1 className="text-5xl font-bold mb-2">

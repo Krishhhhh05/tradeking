@@ -4,7 +4,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(
-    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDUyODgxLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQ1Mjg4MX0.7yFw2Hi1emuDZNb-2LebxsGALfboo9E2zgXoGM1GJA1K6BsPANal1ADpWoWK_pOw4ILgtx-zJpw_-HwCKAEk3Q"
+    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNTAyMjIxLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzUwMjIyMX0.IIV77LV09t7udo4xhQ0UtS7LGAaGvfXLhCEG3LYDYM1c3KjQKxd-f5qHoXvLsWQfyknd_Ob5e-FaHR8XHdS4pg"
   );
   const [userData, setUserData] = useState(null);
 

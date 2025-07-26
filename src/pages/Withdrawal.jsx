@@ -2,14 +2,20 @@ import React, { useState } from "react";
 import { HiOutlineBanknotes } from "react-icons/hi2";
 import { IoWallet, IoWalletOutline } from "react-icons/io5";
 import { MdVerifiedUser } from "react-icons/md";
+import { useAuth } from "../AuthProvider"; // Adjust path
+
+import axios from "axios";
 
 const WithdrawalInterface = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState("");
+  const { userData, token } = useAuth();
+  const [user, setUser] = useState({});
   const [userDetails, setUserDetails] = useState({
-    username: "",
+    mobile: "",
     password: "",
+    comment:""
   });
 
   const quickAmounts = [500, 1000, 5000, 10000, 50000];
@@ -41,12 +47,128 @@ const WithdrawalInterface = () => {
     }
   };
 
-  const handleVerify = () => {
-    if (userDetails.username && userDetails.password) {
-      console.log("Verifying user:", userDetails);
-      alert("Verification successful!");
+const handleVerify = () => {
+    if (!userDetails.mobile || !userDetails.password) {
+      alert("Please enter your mobile number and password.");
+      return;
+    }
+
+    //  let data = JSON.stringify({
+    //   amount: selectedAmount || customAmount,
+    //   branchId: 3,
+    //   comment: userDetails.comment ||"comment",
+    //   userId: userData.userId,
+    //   secondPassword: "1122"
+    // }); 
+
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: `/api/admin/public/api/v1/username/${userDetails.mobile}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      }
+     
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        setUser(response.data);
+// if(user.id === userData.userId && userDetails.password ===user.password){
+ if(response){
+          alert("Verification successful. Proceeding with withdrawal request.");
+       } else {
+         alert("Invalid mobile number or password.");
+       }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+
+  const submitWithdrawalRequest = () => {
+   
+
+        let data = JSON.stringify({
+      amount: selectedAmount || customAmount,
+      branchId: 3,
+      comment: userDetails.comment ||"comment",
+      userId: user.id || userData.userId,
+      secondPassword: "1122"
+    }); 
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "/api/trading/public/api/v1/cashRequest",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      data: data,
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const [generatedOTP, setGeneratedOTP] = useState("");
+  const [enteredOTP, setEnteredOTP] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+
+
+
+  const generateRandomOTP = () => {
+    const otp = Math.floor(1000 + Math.random() * 9000); // 4-digit OTP
+    return otp.toString();
+  };
+
+  const sendOTP = async () => {
+    const otp = generateRandomOTP();
+    setGeneratedOTP(otp);
+
+    const mobile = userDetails.mobile;
+
+    const message = `Dear Users,%0AYour user ID is active and use OTP ${otp}.%0AThank you for choosing us.%0AWe are happy to help you.%0AProfitVista`;
+
+    const apiUrl = `https://pgapi.smartping.ai/fe/api/v1/send?username=otpsmsgame.trans&password=Qwerty@123&unicode=false&from=PROFN&to=${mobile}&dltPrincipalEntityId=1701172415051608213&dltContentId=1707172467291922195&text=${message}`;
+    let response;
+
+
+    try {
+       response = await axios.get(apiUrl);
+      console.log( response);
+      if (response.status === 200) {
+        
+      } else {
+        setStatusMessage("Failed to send OTP.");
+      }
+    } catch (error) {
+      console.log( response);
+      console.error("Error sending OTP:", error);
+      // setStatusMessage("Error sending OTP.");
+    }
+    setStatusMessage("OTP sent successfully!");
+  };
+
+  const verifyOTP = () => {
+    if (enteredOTP === generatedOTP) {
+      setStatusMessage("OTP verified successfully!");
+    } else {
+      setStatusMessage("Invalid OTP. Please try again.");
     }
   };
+
+
 
   const renderAmountSelection = () => (
     <div className="min-h-screen bg-slate-950 s-slate-900 p-4">
@@ -167,10 +289,10 @@ const WithdrawalInterface = () => {
             <div className="space-y-4">
               <input
                 type="text"
-                placeholder="Username"
-                value={userDetails.username}
+                placeholder="Mobile Number"
+                value={userDetails.mobile}
                 onChange={(e) =>
-                  handleUserDetailsChange("username", e.target.value)
+                  handleUserDetailsChange("mobile", e.target.value)
                 }
                 className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
               />
@@ -183,18 +305,81 @@ const WithdrawalInterface = () => {
                 }
                 className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
               />
-            </div>
-          </div>
 
-          <div className="flex justify-center">
+              <div className="flex justify-center">
             <button
               onClick={handleVerify}
-              disabled={!userDetails.username || !userDetails.password}
+              disabled={!userDetails.mobile || !userDetails.password}
               className="px-10 bg-pink-500 hover:bg-pink-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg transition-colors "
             >
               Verify
             </button>
           </div>
+              <textarea
+  placeholder="Comment (Optional)"
+  value={userDetails.comment}
+  onChange={(e) =>
+    handleUserDetailsChange("comment", e.target.value)
+  }
+  rows={1}
+  className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50 resize-none"
+/>
+
+<div className="flex justify-center">
+            <button
+              onClick={submitWithdrawalRequest}
+              // disabled={!verified}
+              className="px-10 bg-pink-500 hover:bg-pink-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg transition-colors "
+            >
+              Submit request
+            </button>
+          </div>
+            </div>
+
+
+            <div className="p-6 space-y-4 bg-gray-900 text-white max-w-md mx-auto rounded-lg shadow-md">
+      <h2 className="text-xl font-bold">OTP Verification</h2>
+
+      <input
+        type="text"
+        placeholder="Mobile Number"
+        value={userDetails.mobile}
+        onChange={(e) =>
+          handleUserDetailsChange("mobile", e.target.value)
+        }
+        className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
+      />
+      
+
+      <button
+        onClick={sendOTP}
+        className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg"
+      >
+        Send OTP
+      </button>
+
+      <input
+        type="text"
+        placeholder="Enter OTP"
+        value={enteredOTP}
+        onChange={(e) => setEnteredOTP(e.target.value)}
+        className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
+      />
+
+      <button
+        onClick={verifyOTP}
+        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg"
+      >
+        Verify OTP
+      </button>
+
+      {statusMessage && (
+        <div className="mt-4 text-center font-semibold">{statusMessage}</div>
+      )}
+    </div>
+          </div>
+
+          
         </div>
       </div>
     </div>

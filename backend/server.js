@@ -15,25 +15,26 @@ app.use(express.json());
 
 // Route to call the external login API
 app.get("/get_token", async (req, res) => {
+ 
   let data = JSON.stringify({
-    companyName: "Trade king",
-    password: "15498",
-    userName: "ADMINTEST2",
-  });
+  "companyName": "Trade king",
+  "password": "15498",
+  "userName": "ADMINTEST2"
+});
 
-  const config = {
-    method: "post",
-    maxBodyLength: Infinity,
-    url: "https://dev2.arktrader.io/api/apigateway/login/public/api/v1/login",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: data,
-  };
 
+let config = {
+  method: 'post',
+  maxBodyLength: Infinity,
+  url: 'https://apexapin.theplatformapi.com/api/apigateway/login/public/api/v1/login',
+  headers: { 
+    'Content-Type': 'application/json'
+  },
+  data : data
+};
   try {
     const response = await axios.request(config);
-    res.json(response.data);
+    res.json(response.data.data.token);
   } catch (error) {
     console.error("Login API Error:", error);
     res.status(500).json({ error: "Failed to authenticate" });

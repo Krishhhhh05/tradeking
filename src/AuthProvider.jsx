@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const res = await axios.get("http://localhost:5000/get_token");
         console.log(res.data);
+        setToken(res.data);
       } catch (err) {
         console.log({ error: err });
       }

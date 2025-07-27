@@ -90,40 +90,29 @@ const WithdrawalInterface = () => {
       });
   };
 
-  const submitWithdrawalRequest = () => {
+  const submitWithdrawalRequest = async () => {
     let data = JSON.stringify({
       amount: selectedAmount || customAmount,
-      branchId: 3,
       comment: userDetails.comment || "comment",
       userId: user.id || userData.userId,
-      secondPassword: "1122",
+      authToken: `Bearer ${token}`,
+    });
+    const response = await fetch('https://tradeking.onrender.com/api/cash-request', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: data
     });
 
-    let config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "/api/trading/public/api/v1/cashRequest",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      data: data,
-    };
+    const result = await response.json();
 
-    axios
-      .request(config)
-      .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        setStatusMessage(
-          response.data.message || "Withdrawal request submitted successfully"
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-        setStatusMessage(
-          error.response?.data?.message || error.message || "An error occurred"
-        );
-      });
+    console.log(result);
+    if (!response.ok) {
+      setStatusMessage(result.message || "An error occurred while submitting the request.");
+      return;
+    }
+    setStatusMessage(result.message || "Withdrawal request submitted successfully");
   };
 
   const [generatedOTP, setGeneratedOTP] = useState("");
@@ -225,11 +214,10 @@ const WithdrawalInterface = () => {
                 <button
                   key={amount}
                   onClick={() => handleAmountSelection(amount)}
-                  className={`h-14 rounded-md text-xs md:text-base font-medium transition-all ${
-                    selectedAmount === amount
+                  className={`h-14 rounded-md text-xs md:text-base font-medium transition-all ${selectedAmount === amount
                       ? "bg-pink-500 text-white shadow-lg"
                       : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-                  }`}
+                    }`}
                 >
                   ₹ {amount === 50000 ? "50000" : amount}
                 </button>

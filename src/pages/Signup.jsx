@@ -218,38 +218,31 @@ function Signup() {
     }
   };
 
-  const generateRandomOTP = () => {
-    const otp = Math.floor(1000 + Math.random() * 9000); // 4-digit OTP
-    return otp.toString();
-  };
-
   const [otpDisabled, setOtpDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
   const sendOTP = async () => {
-    const otp = generateRandomOTP();
-    setGeneratedOTP(otp);
-
     const mobile = formData.mobile;
-
-    const message = `Dear Users,%0AYour user ID is active and use OTP ${otp}.%0AThank you for choosing us.%0AWe are happy to help you.%0AProfitVista`;
-
-    const apiUrl = `https://pgapi.smartping.ai/fe/api/v1/send?username=otpsmsgame.trans&password=Qwerty@123&unicode=false&from=PROFN&to=${mobile}&dltPrincipalEntityId=1701172415051608213&dltContentId=1707172467291922195&text=${message}`;
     let response;
 
     try {
-      response = await axios.get(apiUrl);
-      // console.log(response);
-      if (response.status === 200) {
-      } else {
-        setLog("Failed to send OTP.");
+      response = await fetch("https://tradeking.onrender.com/api/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile: mobile }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send OTP");
       }
+      const data = await response.json();
+      setLog(data.message || "OTP sent successfully!");
     } catch (error) {
       // console.log(response);
       console.error("Error sending OTP:", error);
-      // setStatusMessage("Error sending OTP.");
+      setLog("Error sending OTP.");
+      return;
     }
-    setLog("OTP sent successfully!");
 
     // Disable button for 30 seconds
     setOtpDisabled(true);
@@ -267,13 +260,28 @@ function Signup() {
     }, 1000);
   };
 
-  const verifyOTP = () => {
-    if (enteredOTP === generatedOTP) {
-      setOtpVerified(true);
-      setLog("OTP verified successfully!");
-    } else {
-      setLog("Invalid OTP. Please try again.");
-      setOtpVerified(false);
+  const verifyOTP = async () => {
+    try {
+      const response = await fetch(
+        "https://tradeking.onrender.com/api/verify-otp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mobile: formData.mobile, otp: enteredOTP }),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        setLog(data.status);
+        setOtpVerified(true);
+      } else {
+        setLog(data.error);
+        setOtpVerified(false);
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      setLog("Error verifying OTP.");
     }
   };
 
@@ -381,8 +389,6 @@ function Signup() {
               placeholder="Mobile Number"
             />
 
-           
-
             <input
               type="password"
               name="password"
@@ -402,7 +408,7 @@ function Signup() {
               className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
               placeholder="Confirm Password"
             />
- <input
+            <input
               type="text"
               placeholder="Enter OTP"
               value={enteredOTP}

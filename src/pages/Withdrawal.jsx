@@ -92,47 +92,59 @@ const WithdrawalInterface = () => {
   };
 
   const submitWithdrawalRequest = async () => {
+    if (!otpVerified) {
+      setStatusMessage("Please verify OTP first");
+      return;
+    }
+
     let data = JSON.stringify({
       amount: selectedAmount || customAmount,
       comment: userDetails.comment || "comment",
       userId: user.id || userData.userId,
       authToken: `Bearer ${token}`,
     });
-    const response = await fetch('https://tradeking.onrender.com/api/cash-request', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: data
-    });
+    const response = await fetch(
+      "https://tradeking.onrender.com/api/cash-request",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: data,
+      }
+    );
 
     const result = await response.json();
 
     console.log(result);
     if (!response.ok) {
-      setStatusMessage(result.message || "An error occurred while submitting the request.");
+      setStatusMessage(
+        result.message || "An error occurred while submitting the request."
+      );
       return;
     }
-    setStatusMessage(result.message || "Withdrawal request submitted successfully");
+    setStatusMessage(
+      result.message || "Withdrawal request submitted successfully"
+    );
   };
 
   const [generatedOTP, setGeneratedOTP] = useState("");
   const [enteredOTP, setEnteredOTP] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
 
-
   const [otpDisabled, setOtpDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [otpVerified, setOtpVerified] = useState(false);
 
   const sendOTP = async () => {
     const mobile = userDetails.mobile;
     let response;
 
     try {
-        response= await fetch('http://localhost:5000/api/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobile: mobile })
+      response = await fetch("https://tradeking.onrender.com/api/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile: mobile }),
       });
 
       if (!response.ok) {
@@ -165,17 +177,19 @@ const WithdrawalInterface = () => {
 
   const verifyOTP = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobile: userDetails.mobile, otp: enteredOTP })
+      const response = await fetch("https://tradeking.onrender.com/api/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile: userDetails.mobile, otp: enteredOTP }),
       });
 
       const data = await response.json();
-      if (response.ok) {  
-        setStatusMessage("OTP verified successfully!");
+      if (response.ok) {
+        setStatusMessage(data.status);
+        setOtpVerified(true);
       } else {
-        setStatusMessage("Invalid OTP. Please try again.");
+        setStatusMessage(data.error);
+        setOtpVerified(false);
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
@@ -221,10 +235,11 @@ const WithdrawalInterface = () => {
                 <button
                   key={amount}
                   onClick={() => handleAmountSelection(amount)}
-                  className={`h-14 rounded-md text-xs md:text-base font-medium transition-all ${selectedAmount === amount
+                  className={`h-14 rounded-md text-xs md:text-base font-medium transition-all ${
+                    selectedAmount === amount
                       ? "bg-pink-500 text-white shadow-lg"
                       : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-                    }`}
+                  }`}
                 >
                   ₹ {amount === 50000 ? "50000" : amount}
                 </button>

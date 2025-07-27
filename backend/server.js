@@ -81,6 +81,70 @@ app.post('/api/cash-request', async (req, res) => {
   }
 });
 
+// In-memory OTP store: { mobile: { otp, expiresAt } }
+const otpStore = {};
+
+// Utility to generate 4-digit OTP
+const generateRandomOTP = () => {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+};
+
+// Send OTP API
+app.post('/api/send-otp', async (req, res) => {
+  const { mobile } = req.body;
+
+  if (!mobile || mobile.length !== 10) {
+    return res.status(400).json({ error: 'Invalid or missing mobile number' });
+  }
+
+  const otp = generateRandomOTP();
+  const message = `Dear Users,%0AYour user ID is active and use OTP ${otp}.%0AThank you for choosing us.%0AWe are happy to help you.%0AProfitVista`;
+
+  const apiUrl = `https://pgapi.smartping.ai/fe/api/v1/send?username=otpsmsgame.trans&password=Qwerty@123&unicode=false&from=PROFN&to=${mobile}&dltPrincipalEntityId=1701172415051608213&dltContentId=1707172467291922195&text=${message}`;
+
+  try {
+    await axios.get(apiUrl);
+    // Save OTP in memory with 5-min expiry
+    otpStore[mobile] = {
+      otp,
+      expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
+    };
+    res.status(200).json({ status: 'OTP sent successfully' });
+  } catch (error) {
+    console.error('Error sending OTP:', error.message);
+    res.status(500).json({ error: 'Failed to send OTP' });
+  }
+});
+
+// Verify OTP API
+app.post('/api/verify-otp', (req, res) => {
+  const { mobile, otp } = req.body;
+
+  if (!mobile || !otp) {
+    return res.status(400).json({ error: 'Mobile and OTP are required' });
+  }
+
+  const record = otpStore[mobile];
+  if (!record) {
+    return res.status(400).json({ error: 'No OTP sent to this mobile' });
+  }
+
+  const { otp: validOtp, expiresAt } = record;
+
+  if (Date.now() > expiresAt) {
+    delete otpStore[mobile]; // Clean up expired OTP
+    return res.status(400).json({ error: 'OTP has expired' });
+  }
+
+  if (otp === validOtp) {
+    delete otpStore[mobile]; // OTP is used, clean up
+    return res.status(200).json({ status: 'OTP verified successfully' });
+  } else {
+    return res.status(400).json({ error: 'Invalid OTP' });
+  }
+});
+
+
 
 // Start server
 app.listen(PORT, () => {

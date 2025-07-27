@@ -5,6 +5,7 @@ import { MdVerifiedUser } from "react-icons/md";
 import { useAuth } from "../AuthProvider"; // Adjust path
 
 import axios from "axios";
+import { data } from "react-router-dom";
 
 const WithdrawalInterface = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -119,38 +120,32 @@ const WithdrawalInterface = () => {
   const [enteredOTP, setEnteredOTP] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
 
-  const generateRandomOTP = () => {
-    const otp = Math.floor(1000 + Math.random() * 9000); // 4-digit OTP
-    return otp.toString();
-  };
 
   const [otpDisabled, setOtpDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
   const sendOTP = async () => {
-    const otp = generateRandomOTP();
-    setGeneratedOTP(otp);
-
     const mobile = userDetails.mobile;
-
-    const message = `Dear Users,%0AYour user ID is active and use OTP ${otp}.%0AThank you for choosing us.%0AWe are happy to help you.%0AProfitVista`;
-
-    const apiUrl = `https://pgapi.smartping.ai/fe/api/v1/send?username=otpsmsgame.trans&password=Qwerty@123&unicode=false&from=PROFN&to=${mobile}&dltPrincipalEntityId=1701172415051608213&dltContentId=1707172467291922195&text=${message}`;
     let response;
 
     try {
-      response = await axios.get(apiUrl);
-      // console.log(response);
-      if (response.status === 200) {
-      } else {
-        setStatusMessage("Failed to send OTP.");
+        response= await fetch('http://localhost:5000/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile: mobile })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send OTP");
       }
+      const data = await response.json();
+      setStatusMessage(data.message || "OTP sent successfully!");
     } catch (error) {
       // console.log(response);
       console.error("Error sending OTP:", error);
-      // setStatusMessage("Error sending OTP.");
+      setStatusMessage("Error sending OTP.");
+      return;
     }
-    setStatusMessage("OTP sent successfully!");
 
     // Disable button for 30 seconds
     setOtpDisabled(true);
@@ -168,11 +163,23 @@ const WithdrawalInterface = () => {
     }, 1000);
   };
 
-  const verifyOTP = () => {
-    if (enteredOTP === generatedOTP) {
-      setStatusMessage("OTP verified successfully!");
-    } else {
-      setStatusMessage("Invalid OTP. Please try again.");
+  const verifyOTP = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile: userDetails.mobile, otp: enteredOTP })
+      });
+
+      const data = await response.json();
+      if (response.ok) {  
+        setStatusMessage("OTP verified successfully!");
+      } else {
+        setStatusMessage("Invalid OTP. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      setStatusMessage("Error verifying OTP.");
     }
   };
 

@@ -21,8 +21,7 @@ const DepositInterface = () => {
   const [selectedBankId, setSelectedBankId] = useState(0);
   const quickAmounts = [500, 1000, 5000, 10000, 50000];
   const { userData, token } = useAuth(); // Use the AuthProvider context
-  console.log("User Data:", userData);
-  console.log("Token:", token);
+  
   const [clientId, setClientId] = useState(null);
   const [officeId, setOfficeId] = useState(null);
   const [status, setStatus] = useState("");
@@ -32,8 +31,7 @@ const DepositInterface = () => {
     if (userData) {
       setClientId(userData.accountId);
       setOfficeId(userData.officeId);
-      console.log("Client ID:", clientId);
-      console.log("Office ID:", officeId);
+     
     }
   }, [userData]);
 
@@ -58,14 +56,14 @@ const DepositInterface = () => {
           }
 
           const data = await response.json();
-          console.log("Bank Details Fetched:", data.data);
+          // console.log("Bank Details Fetched:", data.data);
           const enabledBanks = data.data.filter((bank) => bank.enable === true);
           const parentId = userData.parentId;
           const parentEnabledBanks = enabledBanks.filter(
             (bank) => bank.officeIds && bank.officeIds.includes(parentId)
           );
           setAvailableBanks(parentEnabledBanks);
-          console.log("Enabled Banks:", enabledBanks);
+          // console.log("Enabled Banks:", enabledBanks);
           // You can store it in state here if needed
         } catch (error) {
           console.error("Error fetching bank details:", error);
@@ -123,7 +121,7 @@ const DepositInterface = () => {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         setStatus(response.data.message);
       })
       .catch((error) => {
@@ -156,7 +154,7 @@ const DepositInterface = () => {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         setStatus(response.data.message);
       })
       .catch((error) => {

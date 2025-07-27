@@ -12,8 +12,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const handleLogin = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/get_token");
-        console.log(res.data);
+        const res = await axios.get("https://tradeking.onrender.com/get_token");
+        // console.log(res.data);
         setToken(res.data);
       } catch (err) {
         console.log({ error: err });

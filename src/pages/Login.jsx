@@ -36,7 +36,7 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Login successful:', data);
+        // console.log('Login successful:', data);
         // You can redirect or store token here
       } else {
         console.error('Login failed:', data.message || data);

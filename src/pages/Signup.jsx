@@ -41,7 +41,7 @@ function Signup() {
         referralCode: referralCodeFromUrl,
       }));
     }
-    console.log("referralCode", referralCodeFromUrl);
+    // console.log("referralCode", referralCodeFromUrl);
   }, []);
 
   const [loading, setLoading] = useState(false);
@@ -131,7 +131,7 @@ function Signup() {
         },
       });
       const referralData = referralRes.data.data;
-      console.log("Referral Response:", referralData);
+      // console.log("Referral Response:", referralData);
 
       // 2️⃣ Step 2: Prepare second API request body
       const requestBody = {
@@ -187,7 +187,7 @@ function Signup() {
         chargeMarginForEntry: referralData.chargeMarginForEntry,
       };
 
-      console.log("Second API Request Body:", requestBody);
+      // console.log("Second API Request Body:", requestBody);
 
       const secondApiUrl = `${BASE_URL}admin/public/api/v1/user`; // REPLACE this
 
@@ -197,7 +197,7 @@ function Signup() {
           "Content-Type": "application/json",
         },
       });
-      console.log("Second API Response:", secondRes.data);
+      // console.log("Second API Response:", secondRes.data);
 
       setLog("Login process completed successfully.");
 
@@ -239,13 +239,13 @@ function Signup() {
 
     try {
       response = await axios.get(apiUrl);
-      console.log(response);
+      // console.log(response);
       if (response.status === 200) {
       } else {
         setLog("Failed to send OTP.");
       }
     } catch (error) {
-      console.log(response);
+      // console.log(response);
       console.error("Error sending OTP:", error);
       // setStatusMessage("Error sending OTP.");
     }
@@ -381,7 +381,28 @@ function Signup() {
               placeholder="Mobile Number"
             />
 
+           
+
             <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              placeholder="Password"
+            />
+
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              placeholder="Confirm Password"
+            />
+ <input
               type="text"
               placeholder="Enter OTP"
               value={enteredOTP}
@@ -405,27 +426,6 @@ function Signup() {
                 Verify
               </button>
             </div>
-
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
-              placeholder="Password"
-            />
-
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
-              placeholder="Confirm Password"
-            />
-
             <button
               onClick={handleSubmit}
               disabled={loading}
@@ -435,14 +435,14 @@ function Signup() {
             </button>
           </div>
 
-          <div className="text-center mt-6">
+          {/* <div className="text-center mt-6">
             <p className="text-white/80">
               Already have an account?{" "}
               <span className="text-cyan-400 font-medium cursor-pointer hover:text-cyan-300">
                 Log in here.
               </span>
             </p>
-          </div>
+          </div> */}
 
           {/* Log output */}
           {log && (

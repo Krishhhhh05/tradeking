@@ -36,7 +36,7 @@ let config = {
     const response = await axios.request(config);
     res.json(response.data.data.token);
   } catch (error) {
-    console.error("Login API Error:", error);
+    // console.error("Login API Error:", error);
     res.status(500).json({ error: "Failed to authenticate" });
   }
 });

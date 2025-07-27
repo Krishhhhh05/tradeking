@@ -113,7 +113,7 @@ const WithdrawalInterface = () => {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         setStatusMessage(
           response.data.message || "Withdrawal request submitted successfully"
         );
@@ -151,13 +151,13 @@ const WithdrawalInterface = () => {
 
     try {
       response = await axios.get(apiUrl);
-      console.log(response);
+      // console.log(response);
       if (response.status === 200) {
       } else {
         setStatusMessage("Failed to send OTP.");
       }
     } catch (error) {
-      console.log(response);
+      // console.log(response);
       console.error("Error sending OTP:", error);
       // setStatusMessage("Error sending OTP.");
     }

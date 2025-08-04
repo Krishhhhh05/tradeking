@@ -23,18 +23,17 @@ const DepositInterface = () => {
   const quickAmounts = [500, 1000, 5000, 10000, 50000];
   const { userData, token } = useAuth(); // Use the AuthProvider context
 
-  const [clientId, setClientId] = useState(null);
-  const [officeId, setOfficeId] = useState(null);
+  const [userId, setUserId] = useState("");
   const [status, setStatus] = useState("");
 
-  // Update state when userData changes
-  useEffect(() => {
-    if (userData) {
-      setClientId(userData.accountId);
-      setOfficeId(userData.officeId);
+  // // Update state when userData changes
+  // useEffect(() => {
+  //   if (userData) {
+  //     setClientId(userData.accountId);
+  //     setOfficeId(userData.officeId);
 
-    }
-  }, [userData]);
+  //   }
+  // }, [userData]);
 
   useEffect(() => {
     const fetchBankDetails = async () => {
@@ -94,6 +93,9 @@ const DepositInterface = () => {
           }
 
           const data = await response.json();
+          setUserId(data.data.id);
+          console.log("User ID:", data.data.id);
+
           console.log("User by Mobile Number:", data);
 
 
@@ -137,7 +139,7 @@ const DepositInterface = () => {
       amount: selectedAmount || customAmount,
       bankId: selectedBankId,
       comment: utrReference,
-      userId: userData.userId,
+      userId: userId,
     });
 
     let config = {

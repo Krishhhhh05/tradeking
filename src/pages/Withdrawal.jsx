@@ -104,7 +104,8 @@ const WithdrawalInterface = () => {
       authToken: `Bearer ${token}`,
     });
     const response = await fetch(
-      "https://tradeking.onrender.com/api/cash-request",
+      // "https://tradeking.onrender.com/api/cash-request",
+      "http://localhost:5000/api/cash-request",
       {
         method: "POST",
         headers: {
@@ -141,7 +142,8 @@ const WithdrawalInterface = () => {
     let response;
 
     try {
-      response = await fetch("https://tradeking.onrender.com/api/send-otp", {
+      // response = await fetch("https://tradeking.onrender.com/api/send-otp", {
+      response = await fetch("http://localhost:5000/api/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile: mobile }),
@@ -177,8 +179,11 @@ const WithdrawalInterface = () => {
 
   const verifyOTP = async () => {
     try {
-      const response = await fetch("https://tradeking.onrender.com/api/verify-otp", {
-        method: "POST",
+      
+      // const response = await fetch("https://tradeking.onrender.com/api/verify-otp", {
+
+       const response = await fetch("http://localhost:5000/api/verify-otp", {
+      method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile: userDetails.mobile, otp: enteredOTP }),
       });

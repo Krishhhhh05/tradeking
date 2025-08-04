@@ -18,8 +18,8 @@ app.get("/get_token", async (req, res) => {
  
   let data = JSON.stringify({
   "companyName": "Trade king",
-  "password": "15498",
-  "userName": "ADMINTEST2"
+  "password": "1234578",
+  "userName": "test02"
 });
 
 

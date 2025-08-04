@@ -38,7 +38,7 @@ const WithdrawalInterface = () => {
       [field]: value,
     }));
   };
-    const handleMobileNumberChange = (e) => {
+  const handleMobileNumberChange = (e) => {
     setMobileNumber(e.target.value);
   };
 
@@ -147,14 +147,15 @@ const WithdrawalInterface = () => {
 
     try {
       response = await fetch("https://tradeking.onrender.com/api/send-otp", {
-      // response = await fetch("http://localhost:5000/api/send-otp", {
+        // response = await fetch("http://localhost:5000/api/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile: mobile }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to send OTP");
+        setStatusMessage(data.error);
+        return;
       }
       const data = await response.json();
       setStatusMessage(data.message || "OTP sent successfully!");
@@ -183,14 +184,15 @@ const WithdrawalInterface = () => {
 
   const verifyOTP = async () => {
     try {
-      
-       const response = await fetch("https://tradeking.onrender.com/api/verify-otp", {
-
-      //  const response = await fetch("http://localhost:5000/api/verify-otp", {
-      method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile: userDetails.mobile, otp: enteredOTP }),
-      });
+      const response = await fetch(
+        "https://tradeking.onrender.com/api/verify-otp",
+        {
+          //  const response = await fetch("http://localhost:5000/api/verify-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mobile: userDetails.mobile, otp: enteredOTP }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok) {
@@ -227,8 +229,8 @@ const WithdrawalInterface = () => {
           </div>
         </div>
 
-         {/* Enter Mobile Number */}
-                {/* <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 mb-6">
+        {/* Enter Mobile Number */}
+        {/* <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 mb-6">
                   <div className="flex items-center space-x-3 mb-6">
                     <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
                       <HiOutlineBanknotes className="text-xl " />

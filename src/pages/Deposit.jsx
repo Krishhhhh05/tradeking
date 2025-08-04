@@ -74,40 +74,39 @@ const DepositInterface = () => {
     fetchBankDetails();
   }, [selectedPaymentMethod, token]);
 
-
   // Add this useEffect after your existing useEffects
-  useEffect(() => {
-    const fetchUserByMobile = async () => {
-      if (mobileNumber && token) {
-        try {
-          const response = await fetch(`/api/admin/public/api/v1/username/${mobileNumber}`, {
+  // useEffect(() => {
+  const fetchUserByMobile = async () => {
+    if (mobileNumber && token) {
+      try {
+        const response = await fetch(
+          `/api/admin/public/api/v1/username/${mobileNumber}`,
+          {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
           }
+        );
 
-          const data = await response.json();
-          setUserId(data.data.id);
-          console.log("User ID:", data.data.id);
-
-          console.log("User by Mobile Number:", data);
-
-
-        } catch (error) {
-          console.error("Error fetching user by mobile:", error);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const data = await response.json();
+        setUserId(data.data.id);
+        console.log("User ID:", data.data.id);
+
+        console.log("User by Mobile Number:", data);
+      } catch (error) {
+        console.error("Error fetching user by mobile:", error);
       }
-    };
+    }
+  };
 
-    fetchUserByMobile();
-  }, [mobileNumber, token]); // Dependencies: runs when mobilenumber or token changes
-
+  //   fetchUserByMobile();
+  // }, [mobileNumber, token]); // Dependencies: runs when mobilenumber or token changes
 
   const parseBankDetails = (details) => {
     const cleaned = details.replace(/\r/g, "").split("\n").filter(Boolean);
@@ -135,6 +134,10 @@ const DepositInterface = () => {
   };
 
   const handleBankPaymentSubmit = () => {
+    if (!selectedBankId) {
+      setStatus("Please select a bank first");
+      return;
+    }
     let data = JSON.stringify({
       amount: selectedAmount || customAmount,
       bankId: selectedBankId,
@@ -168,6 +171,10 @@ const DepositInterface = () => {
   };
 
   const handleUpiPaymentSubmit = () => {
+    if (!selectedBankId) {
+      setStatus("Please select a bank first");
+      return;
+    }
     let data = JSON.stringify({
       amount: selectedAmount || customAmount,
       bankId: selectedBankId,
@@ -268,6 +275,21 @@ const DepositInterface = () => {
             </div>
           </div>
 
+          <div className="flex justify-center mb-4">
+            <button
+              onClick={fetchUserByMobile}
+              disabled={!mobileNumber}
+              className="px-6 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg transition-colors"
+            >
+              Verify User
+            </button>
+          </div>
+
+          {userId && (
+            <div className="text-center text-green-400 text-sm">
+              ✓ User verified successfully
+            </div>
+          )}
         </div>
 
         {/* Select Amount Card */}
@@ -287,10 +309,11 @@ const DepositInterface = () => {
                 <button
                   key={amount}
                   onClick={() => handleAmountSelection(amount)}
-                  className={`h-14 rounded-md font-medium text-xs md:text-base transition-all ${selectedAmount === amount
+                  className={`h-14 rounded-md font-medium text-xs md:text-base transition-all ${
+                    selectedAmount === amount
                       ? "bg-pink-500 text-white shadow-lg"
                       : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-                    }`}
+                  }`}
                 >
                   ₹{amount}
                 </button>
@@ -312,7 +335,6 @@ const DepositInterface = () => {
               />
             </div>
           </div>
-
         </div>
         {/* Payment Method Card */}
         <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
@@ -350,10 +372,11 @@ const DepositInterface = () => {
               <button
                 key={method.id}
                 onClick={() => handlePaymentMethodSelect(method.id)}
-                className={`p-2 rounded-md flex flex-col items-center justify-center space-y-1 transition-all ${selectedPaymentMethod === method.id
+                className={`p-2 rounded-md flex flex-col items-center justify-center space-y-1 transition-all ${
+                  selectedPaymentMethod === method.id
                     ? "bg-pink-500 text-white shadow-lg"
                     : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-                  }`}
+                }`}
               >
                 <div className="rounded-full p-3 md:w-16 md:h-16 flex justify-center items-center bg-violet-950 ">
                   {method.icon}
@@ -362,15 +385,17 @@ const DepositInterface = () => {
               </button>
             ))}
           </div>
-          <div className="flex justify-center">
-            <button
-              onClick={() => setCurrentStep(3)}
-              disabled={!selectedPaymentMethod}
-              className="px-10 bg-pink-500 hover:bg-pink-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg transition-colors"
-            >
-              Proceed with Payment
-            </button>
-          </div>
+          {userId && (
+            <div className="flex justify-center">
+              <button
+                onClick={() => setCurrentStep(3)}
+                disabled={!selectedPaymentMethod}
+                className="px-10 bg-pink-500 hover:bg-pink-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-lg transition-colors"
+              >
+                Proceed with Payment
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -412,10 +437,11 @@ const DepositInterface = () => {
             <button
               key={method}
               onClick={() => handlePaymentMethodSelect(method)}
-              className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${selectedPaymentMethod === method
+              className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${
+                selectedPaymentMethod === method
                   ? "bg-pink-500 text-white"
                   : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-                }`}
+              }`}
             >
               {method.toUpperCase()}
             </button>
@@ -439,10 +465,11 @@ const DepositInterface = () => {
               <div
                 key={bank.id}
                 onClick={() => setSelectedBankId(bank.id)}
-                className={`relative bg-slate-900/80 rounded-lg border cursor-pointer transition-all overflow-hidden ${selectedBankId === bank.id
+                className={`relative bg-slate-900/80 rounded-lg border cursor-pointer transition-all overflow-hidden ${
+                  selectedBankId === bank.id
                     ? "border-pink-500 bg-pink-500/10"
                     : "border-slate-700/50 hover:border-slate-600"
-                  }`}
+                }`}
               >
                 <div className="w-full h-64 flex items-center justify-center p-4">
                   <img
@@ -566,10 +593,11 @@ const DepositInterface = () => {
             <button
               key={method}
               onClick={() => handlePaymentMethodSelect(method)}
-              className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${selectedPaymentMethod === method
+              className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${
+                selectedPaymentMethod === method
                   ? "bg-pink-500 text-white"
                   : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-                }`}
+              }`}
             >
               {method.toUpperCase()}
             </button>
@@ -583,10 +611,11 @@ const DepositInterface = () => {
             <div
               key={bank.id}
               onClick={() => setSelectedBankId(bank.id)}
-              className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${selectedBankId === bank.id
+              className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${
+                selectedBankId === bank.id
                   ? "border-pink-500 bg-pink-500/10"
                   : "border-slate-700/50 hover:border-slate-600"
-                }`}
+              }`}
             >
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">

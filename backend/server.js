@@ -99,8 +99,8 @@ app.post('/api/send-otp', async (req, res) => {
 
   const otp = generateRandomOTP();
   const message = `Dear Users,%0AYour user ID is active and use OTP ${otp}.%0AThank you for choosing us.%0AWe are happy to help you.%0AProfitVista`;
-
-  const apiUrl = `https://pgapi.smartping.ai/fe/api/v1/send?username=otpsmsgame.trans&password=Qwerty@123&unicode=false&from=PROFN&to=${mobile}&dltPrincipalEntityId=1701172415051608213&dltContentId=1707172467291922195&text=${message}`;
+const apiUrl = `http://3.110.17.247/V2/http-api.php?apikey=t6J4YjYaBCsc3JwZ&senderid=QRISLB&number=${mobile}&message=One Time Password to verify your mobile number to login with Trade King is ${otp}&format=json`;
+  // const apiUrl = `https://pgapi.smartping.ai/fe/api/v1/send?username=otpsmsgame.trans&password=Qwerty@123&unicode=false&from=PROFN&to=${mobile}&dltPrincipalEntityId=1701172415051608213&dltContentId=1707172467291922195&text=${message}`;
 
   try {
     await axios.get(apiUrl);

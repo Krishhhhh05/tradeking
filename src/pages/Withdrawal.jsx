@@ -13,6 +13,7 @@ const WithdrawalInterface = () => {
   const [customAmount, setCustomAmount] = useState("");
   const { userData, token } = useAuth();
   const [user, setUser] = useState({});
+  const [mobileNumber, setMobileNumber] = useState("");
   const [userDetails, setUserDetails] = useState({
     mobile: "",
     password: "",
@@ -36,6 +37,9 @@ const WithdrawalInterface = () => {
       ...prev,
       [field]: value,
     }));
+  };
+    const handleMobileNumberChange = (e) => {
+    setMobileNumber(e.target.value);
   };
 
   const getSelectedAmountValue = () => {
@@ -104,8 +108,8 @@ const WithdrawalInterface = () => {
       authToken: `Bearer ${token}`,
     });
     const response = await fetch(
-      // "https://tradeking.onrender.com/api/cash-request",
-      "http://localhost:5000/api/cash-request",
+      "https://tradeking.onrender.com/api/cash-request",
+      // "http://localhost:5000/api/cash-request",
       {
         method: "POST",
         headers: {
@@ -142,8 +146,8 @@ const WithdrawalInterface = () => {
     let response;
 
     try {
-      // response = await fetch("https://tradeking.onrender.com/api/send-otp", {
-      response = await fetch("http://localhost:5000/api/send-otp", {
+      response = await fetch("https://tradeking.onrender.com/api/send-otp", {
+      // response = await fetch("http://localhost:5000/api/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile: mobile }),
@@ -180,9 +184,9 @@ const WithdrawalInterface = () => {
   const verifyOTP = async () => {
     try {
       
-      // const response = await fetch("https://tradeking.onrender.com/api/verify-otp", {
+       const response = await fetch("https://tradeking.onrender.com/api/verify-otp", {
 
-       const response = await fetch("http://localhost:5000/api/verify-otp", {
+      //  const response = await fetch("http://localhost:5000/api/verify-otp", {
       method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile: userDetails.mobile, otp: enteredOTP }),
@@ -222,6 +226,34 @@ const WithdrawalInterface = () => {
             <img src="/logo.png" />
           </div>
         </div>
+
+         {/* Enter Mobile Number */}
+                {/* <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 mb-6">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
+                      <HiOutlineBanknotes className="text-xl " />
+                    </div>
+                    <h2 className="text-white text-base font-semibold">
+                      User Verification
+                    </h2>
+                  </div>
+                  <div className="mb-6">
+                    <p className="text-slate-300 text-sm mb-3">Mobile Number</p>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-200">
+                        +91
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Enter Mobile Number"
+                        value={userDetails.mobile}
+                        onChange={handleMobileNumberChange}
+                        className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg pl-12 pr-4 py-3 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50 appearance-none"
+                      />
+                    </div>
+                  </div>
+        
+                </div> */}
         {/* Select Amount Card */}
         <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
           <div className="flex items-center space-x-3 mb-6">

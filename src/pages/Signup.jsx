@@ -302,11 +302,11 @@ function Signup() {
           }}
         >
           {/* Logo - Positioned at top-left */}
-          <div className="absolute top-4 left-4 w-16 h-16 z-10">
+          <div className="absolute top-4 left-4 w-28 h-28 z-10">
             <img
-              src="/logo.png"
+              src="/logo_white.png"
               alt="Logo"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain rounded-xl"
             />
           </div>
 

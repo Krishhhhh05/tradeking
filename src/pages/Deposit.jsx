@@ -244,13 +244,13 @@ const DepositInterface = () => {
               <p className="text-slate-300">Fast And Secure Transactions</p>
             </div>
           </div>
-          <div className="flex flex-col w-20 p-2 items-center">
-            <img src="/logo.png" alt="Logo" />
+          <div className="flex flex-col w-28 p-2 items-center rounded-xl">
+            <img src="/logo_white.png" alt="Logo" className="w-full h-auto rounded-md"/>
           </div>
         </div>
 
         {/* Enter Mobile Number */}
-        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 mb-6">
+        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 mb-2">
           <div className="flex items-center space-x-3 mb-6">
             <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
               <HiOutlineBanknotes className="text-xl " />
@@ -293,8 +293,8 @@ const DepositInterface = () => {
         </div>
 
         {/* Select Amount Card */}
-        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 mb-6">
-          <div className="flex items-center space-x-3 mb-6">
+        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 mb-2">
+          <div className="flex items-center space-x-3 ">
             <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
               <HiOutlineBanknotes className="text-xl " />
             </div>
@@ -308,12 +308,14 @@ const DepositInterface = () => {
               {quickAmounts.map((amount) => (
                 <button
                   key={amount}
-                  onClick={() => handleAmountSelection(amount)}
-                  className={`h-14 rounded-md font-medium text-xs md:text-base transition-all ${
-                    selectedAmount === amount
+                  onClick={() => {
+                    handleAmountSelection(amount);
+                    setCustomAmount(String(amount)); // Show selected quick amount in input
+                  }}
+                  className={`h-14 rounded-md font-medium text-xs md:text-base transition-all ${selectedAmount === amount
                       ? "bg-pink-500 text-white shadow-lg"
                       : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-                  }`}
+                    }`}
                 >
                   ₹{amount}
                 </button>
@@ -329,7 +331,7 @@ const DepositInterface = () => {
               <input
                 type="text"
                 placeholder="Enter Custom Amount"
-                value={customAmount}
+                value={selectedAmount ? selectedAmount : customAmount}
                 onChange={handleCustomAmountChange}
                 className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg pl-8 pr-4 py-3 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50 appearance-none"
               />
@@ -372,11 +374,10 @@ const DepositInterface = () => {
               <button
                 key={method.id}
                 onClick={() => handlePaymentMethodSelect(method.id)}
-                className={`p-2 rounded-md flex flex-col items-center justify-center space-y-1 transition-all ${
-                  selectedPaymentMethod === method.id
+                className={`p-2 rounded-md flex flex-col items-center justify-center space-y-1 transition-all ${selectedPaymentMethod === method.id
                     ? "bg-pink-500 text-white shadow-lg"
                     : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-                }`}
+                  }`}
               >
                 <div className="rounded-full p-3 md:w-16 md:h-16 flex justify-center items-center bg-violet-950 ">
                   {method.icon}
@@ -417,12 +418,13 @@ const DepositInterface = () => {
               <p className="text-slate-300">Fast And Secure Transactions</p>
             </div>
           </div>
-          <div className="flex flex-col w-20 p-2 items-center">
-            <img src="/logo.png" alt="Logo" />
-          </div>
-        </div>
+         <div className="flex flex-col w-28 p-2 items-center rounded-md shadow-md" style={{ backgroundColor: 'white' }}>
+  <img src="/logo_white.png" alt="Logo" className="w-full h-auto rounded-md" />
+</div>
 
-        {/* Back Button */}
+
+
+        </div>
         <button
           onClick={() => setCurrentStep(1)}
           className="flex items-center text-slate-300 hover:text-white mb-6 transition-colors"
@@ -437,11 +439,10 @@ const DepositInterface = () => {
             <button
               key={method}
               onClick={() => handlePaymentMethodSelect(method)}
-              className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${
-                selectedPaymentMethod === method
+              className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${selectedPaymentMethod === method
                   ? "bg-pink-500 text-white"
                   : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-              }`}
+                }`}
             >
               {method.toUpperCase()}
             </button>
@@ -465,11 +466,10 @@ const DepositInterface = () => {
               <div
                 key={bank.id}
                 onClick={() => setSelectedBankId(bank.id)}
-                className={`relative bg-slate-900/80 rounded-lg border cursor-pointer transition-all overflow-hidden ${
-                  selectedBankId === bank.id
+                className={`relative bg-slate-900/80 rounded-lg border cursor-pointer transition-all overflow-hidden ${selectedBankId === bank.id
                     ? "border-pink-500 bg-pink-500/10"
                     : "border-slate-700/50 hover:border-slate-600"
-                }`}
+                  }`}
               >
                 <div className="w-full h-64 flex items-center justify-center p-4">
                   <img
@@ -573,8 +573,8 @@ const DepositInterface = () => {
               <p className="text-slate-300">Fast And Secure Transactions</p>
             </div>
           </div>
-          <div className="flex flex-col w-20 p-2 items-center">
-            <img src="/logo.png" alt="Logo" />
+          <div className="flex flex-col w-28 p-2 items-center">
+            <img src="/logo_white.png" alt="Logo" className="w-full h-auto rounded-md" />
           </div>
         </div>
 
@@ -593,11 +593,10 @@ const DepositInterface = () => {
             <button
               key={method}
               onClick={() => handlePaymentMethodSelect(method)}
-              className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${
-                selectedPaymentMethod === method
+              className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${selectedPaymentMethod === method
                   ? "bg-pink-500 text-white"
                   : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
-              }`}
+                }`}
             >
               {method.toUpperCase()}
             </button>
@@ -611,11 +610,10 @@ const DepositInterface = () => {
             <div
               key={bank.id}
               onClick={() => setSelectedBankId(bank.id)}
-              className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${
-                selectedBankId === bank.id
+              className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${selectedBankId === bank.id
                   ? "border-pink-500 bg-pink-500/10"
                   : "border-slate-700/50 hover:border-slate-600"
-              }`}
+                }`}
             >
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">

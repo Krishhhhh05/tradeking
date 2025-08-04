@@ -293,7 +293,7 @@ function Signup() {
       <div className="relative z-10 flex items-center justify-between h-[100%]">
         {/* Left side - Logo and Features */}
         <div
-          className="w-[70%] h-screen relative px-8"
+          className="hidden md:block w-[70%] h-screen relative px-8"
           style={{
             backgroundImage: "url('/eth2.png')", // ensure the image path is correct
             backgroundSize: "cover",
@@ -323,7 +323,6 @@ function Signup() {
                 </h3>
               </div>
             </div>
-
             {/* Instant Payouts */}
             <div className="group w-full bg-gradient-to-br from-purple-900/50 to-purple-800/30 backdrop-blur-md border border-purple-400/30 rounded-3xl p-4 hover:bg-gradient-to-br hover:from-purple-800/60 hover:to-purple-700/40 transition-all duration-500 flex flex-col items-center hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-600/80 to-purple-500/60 rounded-2xl flex items-center justify-center mb-6 group-hover:from-purple-500 group-hover:to-purple-400 transition-all duration-300 shadow-lg">
@@ -335,7 +334,6 @@ function Signup() {
                 </h3>
               </div>
             </div>
-
             {/* Up to 500x */}
             <div className="group w-full bg-gradient-to-br from-purple-900/50 to-purple-800/30 backdrop-blur-md border border-purple-400/30 rounded-3xl p-4 hover:bg-gradient-to-br hover:from-purple-800/60 hover:to-purple-700/40 transition-all duration-500 flex flex-col items-center hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-600/80 to-purple-500/60 rounded-2xl flex items-center justify-center mb-6 group-hover:from-purple-500 group-hover:to-purple-400 transition-all duration-300 shadow-lg">
@@ -347,7 +345,6 @@ function Signup() {
                 </h3>
               </div>
             </div>
-
             {/* Indian & International Markets */}
             <div className="group w-full bg-gradient-to-br from-purple-900/50 to-purple-800/30 backdrop-blur-md border border-purple-400/30 rounded-3xl p-4 hover:bg-gradient-to-br hover:from-purple-800/60 hover:to-purple-700/40 transition-all duration-500 flex flex-col items-center hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-600/80 to-purple-500/60 rounded-2xl flex items-center justify-center mb-6 group-hover:from-purple-500 group-hover:to-purple-400 transition-all duration-300 shadow-lg">
@@ -362,19 +359,28 @@ function Signup() {
           </div>
         </div>
 
-        <div className=" w-[30%] mx-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold tracking-wide bg-gradient-to-r from-cyan-300 to-pink-400 bg-clip-text text-transparent">
+        <div className="md:w-[30%] mx-4 md:mx-8">
+          <div className="flex  md:hidden justify-center items-center">
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="w-24 m-4 pb-6 h-full object-contain"
+            />
+          </div>
+          <div className="text-center mb-4 md:mb-8">
+            <h1 className="text-2xl lg:text-3xl font-bold tracking-wide bg-gradient-to-r from-cyan-300 to-pink-400 bg-clip-text text-transparent">
               REGISTER HERE
             </h1>
-            <p className="text-white">Let's Get Started!</p>
+            <p className="text-white text-sm md:text-base">
+              Let's Get Started!
+            </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {/* Display Referral Code */}
-            <div className="w-full px-6 py-4 bg-gradient-to-r from-purple-700/60 to-pink-600/40 border-2 border-purple-400/40 rounded-full text-white font-semibold text-lg flex items-center justify-between shadow-lg">
+            <div className="w-full px-3 py-2 md:px-6 md:py-4 bg-gradient-to-r from-purple-700/60 to-pink-600/40 border-2 border-purple-400/40 rounded-full text-white font-semibold text-sm md:text-lg flex items-center justify-between shadow-lg">
               <span>Referral Code</span>
-              <span className="bg-black/30 px-4 py-1 rounded-full text-cyan-300 tracking-wider font-mono text-base">
+              <span className="bg-black/30 px-2 py-1 md:px-4 md:py-1 rounded-full text-cyan-300 tracking-wider font-mono text-xs md:text-base">
                 {formData.referralCode}
               </span>
             </div>
@@ -385,7 +391,7 @@ function Signup() {
               value={formData.mobile}
               onChange={handleChange}
               required
-              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              className="w-full px-4 py-3 md:px-6 md:py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm text-sm md:text-base"
               placeholder="Mobile Number"
             />
 
@@ -395,7 +401,7 @@ function Signup() {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              className="w-full px-4 py-3 md:px-6 md:py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm text-sm md:text-base"
               placeholder="Password"
             />
 
@@ -405,7 +411,7 @@ function Signup() {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              className="w-full px-4 py-3 md:px-6 md:py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm text-sm md:text-base"
               placeholder="Confirm Password"
             />
             <input
@@ -413,13 +419,13 @@ function Signup() {
               placeholder="Enter OTP"
               value={enteredOTP}
               onChange={(e) => setEnteredOTP(e.target.value)}
-              className="w-full px-6 py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+              className="w-full px-4 py-3 md:px-6 md:py-4 bg-black/20 border-2 border-gray-600/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-all duration-300 backdrop-blur-sm text-sm md:text-base"
             />
-            <div className="flex justify-center gap-8">
+            <div className="flex justify-center gap-4 md:gap-8">
               <button
                 disabled={otpDisabled}
                 onClick={sendOTP}
-                className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
+                className="w-full py-2 md:py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-sm md:text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
               >
                 Send OTP
               </button>
@@ -427,7 +433,7 @@ function Signup() {
               <button
                 onClick={verifyOTP}
                 disabled={!formData.mobile || !enteredOTP}
-                className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
+                className="w-full py-2 md:py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-sm md:text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
               >
                 Verify
               </button>
@@ -435,20 +441,11 @@ function Signup() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
+              className="w-full py-3 md:py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-base md:text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
             >
               {loading ? "Processing..." : "Sign Up"}
             </button>
           </div>
-
-          {/* <div className="text-center mt-6">
-            <p className="text-white/80">
-              Already have an account?{" "}
-              <span className="text-cyan-400 font-medium cursor-pointer hover:text-cyan-300">
-                Log in here.
-              </span>
-            </p>
-          </div> */}
 
           {/* Log output */}
           {log && (

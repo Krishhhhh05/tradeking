@@ -224,8 +224,8 @@ const WithdrawalInterface = () => {
               <p className="text-slate-300 ">Fast And Secure Transactions</p>
             </div>
           </div>
-          <div className="flex flex-col w-20 p-2 items-center">
-            <img src="/logo.png" />
+          <div className="flex flex-col w-24 p-2 items-center ">
+            <img src="/logo_white.png" className="rounded-md"/>
           </div>
         </div>
 
@@ -305,8 +305,8 @@ const WithdrawalInterface = () => {
               <p className="text-slate-300 ">Fast And Secure Transactions</p>
             </div>
           </div>
-          <div className="flex flex-col w-20 p-2 items-center">
-            <img src="/logo.png" />
+          <div className="flex flex-col w-24 p-2 items-center ">
+            <img src="/logo_white.png" className="rounded-md" />
           </div>
         </div>
 

@@ -90,24 +90,30 @@ const generateRandomOTP = () => {
 };
 
 // Send OTP API
-app.post('/api/send-otp', async (req, res) => {
+app.get('/api/send-otp', async (req, res) => {
+  console.log('Received request:', req.body); // Log the incoming request
+
   const { mobile } = req.body;
 
   if (!mobile || mobile.length !== 10) {
+    console.log('Invalid mobile:', mobile);
     return res.status(400).json({ error: 'Invalid or missing mobile number' });
   }
 
   const otp = generateRandomOTP();
+  console.log('Generated OTP:', otp);
+
   const message = `Dear Users,%0AYour user ID is active and use OTP ${otp}.%0AThank you for choosing us.%0AWe are happy to help you.%0AProfitVista`;
-const apiUrl = `http://3.110.17.247/V2/http-api.php?apikey=t6J4YjYaBCsc3JwZ&senderid=QRISLB&number=${mobile}&message=One Time Password to verify your mobile number to login with Trade King is ${otp}&format=json`;
-  // const apiUrl = `https://pgapi.smartping.ai/fe/api/v1/send?username=otpsmsgame.trans&password=Qwerty@123&unicode=false&from=PROFN&to=${mobile}&dltPrincipalEntityId=1701172415051608213&dltContentId=1707172467291922195&text=${message}`;
+
+  const apiUrl = `http://3.110.17.247/V2/http-api.php?apikey=t6J4YjYaBCsc3JwZ&senderid=QRISLB&number=${mobile}&message=One Time Password to verify your mobile number to login with Trade King is ${otp}&format=json`;
 
   try {
-    await axios.get(apiUrl);
-    // Save OTP in memory with 5-min expiry
+    const apiResponse = await axios.get(apiUrl);
+    console.log('API response:', apiResponse.data);
+
     otpStore[mobile] = {
       otp,
-      expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
+      expiresAt: Date.now() + 5 * 60 * 1000,
     };
     res.status(200).json({ status: 'OTP sent successfully' });
   } catch (error) {

@@ -212,9 +212,9 @@ function Signup() {
 
       setLog("User signed up and logged in successfully.");
     } catch (error) {
-      console.error("Error during login process:", error.response.data.message);
+      console.error("Error during login process:", error.response.data?.message || error.message);
 
-      setLog(`Error: ${error.response.data.message}`);
+      setLog(`Error: ${error.response.data?.message|| error.message}`);
     } finally {
       setLoading(false);
     }

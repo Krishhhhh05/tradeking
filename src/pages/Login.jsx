@@ -1,104 +1,70 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-function Login() {
-  const [formData, setFormData] = useState({
-    userName: '',
-    password: ''
-  });
+const UserTable = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const requestBody = {
-      companyName: 'Apex',
-      userName: formData.userName,
-      password: formData.password
+  // Fetch users from backend
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/users');
+        const data = await response.json();
+        setUsers(data);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-   const baseUrl = "https://apexapin.theplatformapi.com/api/apigateway/";
-
-  try {
-    const response = await fetch(`${baseUrl}/login/public/api/v1/login`,  {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // console.log('Login successful:', data);
-        // You can redirect or store token here
-      } else {
-        console.error('Login failed:', data.message || data);
-        alert('Login failed: ' + (data.message || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Error during login:', error);
-      alert('Network error. Please try again.');
-    }
-  };
+    fetchUsers();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-      {/* ... Your existing background and logo code remains unchanged ... */}
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4 text-center">Registered Users</h2>
 
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-8">
-        <div className="w-full max-w-md">
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold mb-2 text-white">
-                Login
-              </h1>
-              <p className="text-white/70 text-lg">Sign in to your account</p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <input
-                  type="text"
-                  name="userName"
-                  value={formData.userName}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-                  placeholder="Username"
-                />
-              </div>
-              
-              <div>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-                  placeholder="Password"
-                />
-              </div>
-              
-              <button
-                type="submit"
-                className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-              >
-                Sign In
-              </button>
-            </form>
-          </div>
+      {loading ? (
+        <p className="text-center">Loading...</p>
+      ) : users.length === 0 ? (
+        <p className="text-center text-gray-500">No users found.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <thead className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+              <tr>
+                <th className="py-3 px-4 text-left">#</th>
+                <th className="py-3 px-4 text-left">Mobile Number</th>
+                <th className="py-3 px-4 text-left">Verified</th>
+                <th className="py-3 px-4 text-left">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user, index) => (
+                <tr key={user._id} className="border-b hover:bg-gray-50">
+                  <td className="py-2 px-4">{index + 1}</td>
+                  <td className="py-2 px-4">{user.mobile}</td>
+                  <td className="py-2 px-4">
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-sm font-semibold ${
+                        user.verified ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'
+                      }`}
+                    >
+                      {user.verified ? 'Verified' : 'Not Verified'}
+                    </span>
+                  </td>
+                  <td className="py-2 px-4">
+                    {new Date(user.timestamp).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </div>
+      )}
     </div>
   );
-}
+};
 
-export default Login;
+export default UserTable;

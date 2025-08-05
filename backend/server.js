@@ -1,6 +1,12 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+
+// Load environment variables from .env
+dotenv.config();
 
 const app = express();
 const PORT = 5000;
@@ -12,6 +18,9 @@ app.use(
   })
 );
 app.use(express.json());
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
 
 // Route to call the external login API
 app.get("/get_token", async (req, res) => {
@@ -147,6 +156,84 @@ app.post('/api/verify-otp', (req, res) => {
   }
 });
 
+// Connect to MongoDB
+const MONGO_URI = process.env.MONGO_URI;
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err.message);
+    process.exit(1); // Stop server if DB connection fails
+  });
+
+// User Schema
+const userSchema = new mongoose.Schema({
+  mobile: { type: String, required: true, unique: true },
+  verified: { type: Boolean, default: false },
+  timestamp: { type: Date, default: Date.now },
+});
+
+const User = mongoose.model('User', userSchema);
+
+// POST /api/users - Save mobile number
+app.post('/api/users', async (req, res) => {
+  const { mobile, verified = false } = req.body;
+
+  if (!mobile) {
+    return res.status(400).json({ message: 'Mobile number is required' });
+  }
+
+  try {
+    const user = new User({ mobile, verified });
+    await user.save();
+    res.status(201).json({ message: 'User saved', user });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ message: 'Mobile number already exists' });
+    }
+    console.error('Error saving user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// PUT /api/users/verify - Mark user as verified
+app.put('/api/users/verify', async (req, res) => {
+  const { mobile } = req.body;
+
+  if (!mobile) {
+    return res.status(400).json({ message: 'Mobile number is required' });
+  }
+
+  try {
+    const user = await User.findOneAndUpdate(
+      { mobile },
+      { verified: true },
+      { new: true } // return the updated document
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'User verification status updated', user });
+  } catch (error) {
+    console.error('Verification update error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// GET /api/users - List all users
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find().sort({ timestamp: -1 });
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 // Start server

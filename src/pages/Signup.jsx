@@ -238,6 +238,8 @@ function Signup() {
   const [otpDisabled, setOtpDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
+
+
   const sendOTP = async () => {
     const mobile = formData.mobile;
     let response;
@@ -254,11 +256,18 @@ function Signup() {
       }
       const data = await response.json();
       setLog(data.message || "OTP sent successfully!");
+
+      
     } catch (error) {
       // console.log(response);
       console.error("Error sending OTP:", error);
       setLog("Error sending OTP.");
       return;
+    }
+    try {
+      await saveData();
+    } catch (error) {
+      console.error("Error saving user:", error);
     }
 
     // Disable button for 30 seconds
@@ -277,6 +286,46 @@ function Signup() {
     }, 1000);
   };
 
+  const saveData = async () => {
+  try {
+    
+    // After sending OTP, store the mobile number in DB
+    const response = await fetch('http://localhost:5000/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        mobile: formData.mobile,
+        verified: false // Initially not verified
+      })
+    });
+
+    const data = await response.json();
+    console.log("Saved to DB:", data);
+
+  } catch (error) {
+    console.error("Error saving user:", error);
+  }
+};
+const verifyStatus= async () => {
+  try {
+    // Assume OTP verification is successful and you have mobileNumber
+    const response = await fetch('http://localhost:5000/api/users/verify', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ mobile: formData.mobile }),
+    });
+
+    const data = await response.json();
+    console.log('User verified in DB:', data);
+
+  } catch (error) {
+    console.error('Error verifying user:', error);
+  }
+};
   const verifyOTP = async () => {
     try {
       const response = await fetch(
@@ -296,11 +345,21 @@ function Signup() {
         setLog(data.error);
         setOtpVerified(false);
       }
+try {
+  await verifyStatus();
+  console.log("User status verified successfully");
+} catch (error) {
+  console.error("Error verifying user status:", error);
+}
+
+
     } catch (error) {
       console.error("Error verifying OTP:", error);
       setLog("Error verifying OTP.");
     }
   };
+  
+
 
   return (
     <div className="min-h-screen  overflow-hidden bg-slate-950">

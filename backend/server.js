@@ -102,9 +102,6 @@ app.post('/api/send-otp', async (req, res) => {
 
   const otp = generateRandomOTP();
   console.log('Generated OTP:', otp);
-
-  const message = `Dear Users,%0AYour user ID is active and use OTP ${otp}.%0AThank you for choosing us.%0AWe are happy to help you.%0AProfitVista`;
-
   const apiUrl = `http://3.110.17.247/V2/http-api.php?apikey=t6J4YjYaBCsc3JwZ&senderid=QRISLB&number=${mobile}&message=One%20Time%20Password%20to%20verify%20your%20mobile%20number%20to%20login%20with%20Qris%20Health%20is%20${otp}&format=json`;
 
   try {

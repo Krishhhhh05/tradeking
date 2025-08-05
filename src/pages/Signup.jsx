@@ -211,8 +211,8 @@ function Signup() {
 
       setLog("User signed up and logged in successfully.");
     } catch (error) {
-      console.error("Error during login process:", error);
-      setLog(`Error: ${error.message}`);
+      console.error("Error during login process:", error.response.data.message);
+      setLog(`Error: ${error.response.data.message}`);
     } finally {
       setLoading(false);
     }
@@ -362,7 +362,7 @@ function Signup() {
         <div className="md:w-[30%] mx-4 md:mx-8">
           <div className="flex  md:hidden justify-center items-center">
             <img
-              src="/logo.png"
+              src="/logo_white.png"
               alt="Logo"
               className="w-24 m-4 pb-6 h-full object-contain"
             />

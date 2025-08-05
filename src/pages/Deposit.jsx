@@ -38,7 +38,7 @@ const DepositInterface = () => {
   useEffect(() => {
     const fetchBankDetails = async () => {
       if (
-        (selectedPaymentMethod === "bank" || selectedPaymentMethod === "upi") &&
+        (selectedPaymentMethod === "bank" || selectedPaymentMethod === "upi" || selectedPaymentMethod === "crypto") &&
         token
       ) {
         try {
@@ -683,7 +683,131 @@ const DepositInterface = () => {
       </div>
     </div>
   );
+const renderCryptoPayment = () => (
+    <div className="min-h-screen bg-slate-950 p-4 pb-20">
+      <div className="max-w-4xl mx-auto pt-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-3">
+            <div className="bg-violet-950 rounded-full p-3 flex items-center justify-center">
+              <IoWalletOutline className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold tracking-wide bg-gradient-to-r from-cyan-300 to-pink-400 bg-clip-text text-transparent">
+                DEPOSIT
+              </h1>
+              <p className="text-slate-300">Fast And Secure Transactions</p>
+            </div>
+          </div>
+          <div className="flex flex-col w-28 p-2 items-center">
+            <img src="/logo_white.png" alt="Logo" className="w-full h-auto rounded-md" />
+          </div>
+        </div>
 
+        {/* Back Button */}
+        <button
+          onClick={() => setCurrentStep(1)}
+          className="flex items-center text-slate-300 hover:text-white mb-6 transition-colors"
+        >
+          <span className="mr-2">←</span>
+          Payment Details
+        </button>
+
+        {/* Payment Method Tabs */}
+        <div className="flex space-x-1 mb-6">
+          {["cash", "crypto", "bank", "upi"].map((method) => (
+            <button
+              key={method}
+              onClick={() => handlePaymentMethodSelect(method)}
+              className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${selectedPaymentMethod === method
+                  ? "bg-pink-500 text-white"
+                  : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
+                }`}
+            >
+              {method.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        {availableBanks.map((bank) => {
+          const parsed = parseBankDetails(bank.details);
+
+          return (
+            <div
+              key={bank.id}
+              onClick={() => setSelectedBankId(bank.id)}
+              className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${selectedBankId === bank.id
+                  ? "border-pink-500 bg-pink-500/10"
+                  : "border-slate-700/50 hover:border-slate-600"
+                }`}
+            >
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
+                  <RiBankFill className="text-xl " />
+                </div>
+                <h2 className="text-white text-base font-semibold">
+                  BANK DETAILS
+                </h2>
+                {selectedBankId === bank.id && (
+                  <div className="ml-auto">
+                    <MdVerifiedUser className="text-pink-500 text-xl" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-4">
+                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
+                  {bank.name}
+                </div>
+                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
+                  {parsed.accountNumber}
+                </div>
+                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
+                  {parsed.ifsc}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Payment Confirmation */}
+        <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
+              <MdVerifiedUser className="text-xl " />
+            </div>
+            <h2 className="text-white text-base font-semibold">
+              PAYMENT CONFIRMATION
+            </h2>
+          </div>
+          <div>
+            <p className="text-slate-300 text-sm mb-3">
+              Enter your UTR Reference Number
+            </p>
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="# UTR Reference Number"
+                value={utrReference}
+                onChange={(e) => setUtrReference(e.target.value)}
+                className="flex-1 bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-l-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50"
+              />
+              <button
+                onClick={handleBankPaymentSubmit}
+                className="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-lg transition-colors"
+              >
+                <CgArrowRight className="text-xl" />
+              </button>
+            </div>
+          </div>
+          {status && (
+            <div className="mt-4 text-center text-white font-semibold">
+              {status}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
   // Render based on current step and method
   if (currentStep === 1) {
     return renderAmountSelection();
@@ -694,6 +818,8 @@ const DepositInterface = () => {
       return renderUPIPayment();
     } else if (selectedPaymentMethod === "bank") {
       return renderBankPayment();
+    } else if (selectedPaymentMethod === "crypto") {
+      return renderCryptoPayment();
     } else {
       return renderUPIPayment();
     }

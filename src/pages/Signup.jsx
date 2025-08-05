@@ -133,6 +133,7 @@ function Signup() {
       });
       const referralData = referralRes?.data?.data;
       console.log("Referral Response:", referralData);
+      console.log("Referral Res:", referralRes);
 
 
 

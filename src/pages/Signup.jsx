@@ -123,7 +123,7 @@ function Signup() {
 
     try {
       // 1️⃣ Step 1: Fetch referral code user data
-      const url = `/api/admin/public/api/v1/username/${formData.referralCode}`;
+      const url = `${BASE_URL}admin/public/api/v1/username/${formData.referralCode}`;
 
       const referralRes = await axios.get(url, {
         headers: {

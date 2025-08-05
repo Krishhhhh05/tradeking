@@ -95,6 +95,7 @@ const DepositInterface = () => {
         }
 
         const data = await response.json();
+        console.log("User Data:", data);
         setUserId(data.data.id);
         console.log("User ID:", data.data.id);
 

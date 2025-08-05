@@ -147,7 +147,7 @@ function Signup() {
         canTransferPosition: referralData.canTransferPosition,
         country: referralData.country || "Afghanistan",
         currenciesPolicyID: referralData.currenciesPolicyId,
-        firstName: referralData.firstName || "User",
+        firstName: formData.mobile,
         forceChangePassword: false,
         genericPolicyID: referralData.genericPolicyId,
         ignoreLiquidation: referralData.ignoreLiquidation,

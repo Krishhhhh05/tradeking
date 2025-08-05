@@ -48,7 +48,7 @@ function Signup() {
   const [log, setLog] = useState(null); // For debugging logs/output
   const [generatedOTP, setGeneratedOTP] = useState("");
   const [enteredOTP, setEnteredOTP] = useState("");
-  const [otpVerified, setOtpVerified] = useState(true);
+  const [otpVerified, setOtpVerified] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {

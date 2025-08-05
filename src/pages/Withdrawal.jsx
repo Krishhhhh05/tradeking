@@ -14,6 +14,8 @@ const WithdrawalInterface = () => {
   const { userData, token } = useAuth();
   const [user, setUser] = useState({});
   const [mobileNumber, setMobileNumber] = useState("");
+  const BASE_URL = "https://apexapin.theplatformapi.com/api/apigateway/";
+
   const [userDetails, setUserDetails] = useState({
     mobile: "",
     password: "",
@@ -70,7 +72,7 @@ const WithdrawalInterface = () => {
     let config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `/api/admin/public/api/v1/username/${userDetails.mobile}`,
+      url: `${BASE_URL}admin/public/api/v1/username/${userDetails.mobile}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,

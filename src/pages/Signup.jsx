@@ -155,7 +155,7 @@ function Signup() {
         isDemo: referralData.demo,
         isLocked: referralData.locked,
         lastName: "",
-        mobile: "",
+        mobile: formData.mobile,
         parentId: referralData.id,
         password: formData.password, // From user input
         secondPassword: formData.password,

@@ -60,12 +60,12 @@ function Signup() {
     });
 
     // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: "",
-      });
-    }
+    // if (errors[name]) {
+    //   setErrors({
+    //     ...errors,
+    //     [name]: "",
+    //   });
+    // }
     setLog("");
   };
 
@@ -111,12 +111,13 @@ function Signup() {
     }
 
     let errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      const firstError = Object.values(errors)[0];
-      setLog(`${firstError}`);
-      setLoading(false);
-      return;
-    }
+    console.log(errors);
+    // if (Object.keys(errors).length > 0) {
+    //   const firstError = Object.values(errors)[0];
+    //   setLog(`${firstError}`);
+    //   setLoading(false);
+    //   return;
+    // }
     setLoading(true);
     setLog("Starting login process...");
 

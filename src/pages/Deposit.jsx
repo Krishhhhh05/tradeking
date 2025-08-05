@@ -22,6 +22,7 @@ const DepositInterface = () => {
   const [selectedBankId, setSelectedBankId] = useState(0);
   const quickAmounts = [500, 1000, 5000, 10000, 50000];
   const { userData, token } = useAuth(); // Use the AuthProvider context
+  const BASE_URL = "https://apexapin.theplatformapi.com/api/apigateway/";
 
   const [userId, setUserId] = useState("");
   const [status, setStatus] = useState("");
@@ -42,7 +43,7 @@ const DepositInterface = () => {
         token
       ) {
         try {
-          const response = await fetch(`/api/admin/public/api/v1/bank`, {
+          const response = await fetch(`${BASE_URL}admin/public/api/v1/bank`, {
             // const response = await fetch(`${BASE_URL}admin/public/api/v1/bank`, {
             method: "GET",
             headers: {
@@ -80,7 +81,7 @@ const DepositInterface = () => {
     if (mobileNumber && token) {
       try {
         const response = await fetch(
-          `/api/admin/public/api/v1/username/${mobileNumber}`,
+          `${BASE_URL}admin/public/api/v1/username/${mobileNumber}`,
           {
             method: "GET",
             headers: {
@@ -149,7 +150,7 @@ const DepositInterface = () => {
     let config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "/api/admin/public/api/v1/depositRequest",
+      url: `${BASE_URL}admin/public/api/v1/depositRequest`,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -186,7 +187,7 @@ const DepositInterface = () => {
     let config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "/api/admin/public/api/v1/depositRequest",
+      url: `${BASE_URL}admin/public/api/v1/depositRequest`,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,

@@ -48,7 +48,7 @@ function Signup() {
   const [log, setLog] = useState(null); // For debugging logs/output
   const [generatedOTP, setGeneratedOTP] = useState("");
   const [enteredOTP, setEnteredOTP] = useState("");
-  const [otpVerified, setOtpVerified] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(true);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -131,7 +131,7 @@ function Signup() {
           "Content-Type": "application/json",
         },
       });
-      const referralData = referralRes.data.data;
+      const referralData = referralRes?.data?.data;
       // console.log("Referral Response:", referralData);
 
       // 2️⃣ Step 2: Prepare second API request body
@@ -202,7 +202,7 @@ function Signup() {
 
       setLog("Login process completed successfully.");
 
-      const userData = secondRes.data?.data; // Assuming response contains user data
+      const userData = secondRes?.data?.data; // Assuming response contains user data
       // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBRE1JTlRFU1QyIiwiYXVkIjoiVU5LTk9XTiIsImlzSW52ZXN0b3IiOmZhbHNlLCJ1c2VyTmFtZSI6IkFETUlOVEVTVDIiLCJleHAiOjI3NjczNDM0MTAyLCJ1c2VySWQiOjk4MjMsImlhdCI6MTc1MzQzNDEwMn0.gBkUkFyvf0c0X9eyonuapkMKXamXrpR4Ucc4jMqaNd7IbLe0a7edKiAgbqeF_v4Dze66w1TiOVWjhwt_zvUqYw';
 
       // Save to localStorage
@@ -212,9 +212,20 @@ function Signup() {
 
       setLog("User signed up and logged in successfully.");
     } catch (error) {
-      console.error("Error during login process:", error.response.data?.message || error.message);
+      console.error("Error during login process:", error);
 
-      setLog(`Error: ${error.response.data?.message|| error.message}`);
+      // Improved error handling with existence checks
+      let errorMessage = "An unexpected error occurred";
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setLog(`Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

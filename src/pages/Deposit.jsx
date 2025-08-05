@@ -23,18 +23,10 @@ const DepositInterface = () => {
   const quickAmounts = [500, 1000, 5000, 10000, 50000];
   const { userData, token } = useAuth(); // Use the AuthProvider context
   const BASE_URL = "https://apexapin.theplatformapi.com/api/apigateway/";
-
+  const [parentId, setParentId] = useState(""); // Set your parent ID here
   const [userId, setUserId] = useState("");
   const [status, setStatus] = useState("");
 
-  // // Update state when userData changes
-  // useEffect(() => {
-  //   if (userData) {
-  //     setClientId(userData.accountId);
-  //     setOfficeId(userData.officeId);
-
-  //   }
-  // }, [userData]);
 
   useEffect(() => {
     const fetchBankDetails = async () => {
@@ -57,14 +49,15 @@ const DepositInterface = () => {
           }
 
           const data = await response.json();
-          // console.log("Bank Details Fetched:", data.data);
+          console.log("Bank Details Fetched:", data.data);
           const enabledBanks = data.data.filter((bank) => bank.enable === true);
-          const parentId = userData.parentId;
+          console.log("Parent ID:", parentId);
           const parentEnabledBanks = enabledBanks.filter(
             (bank) => bank.officeIds && bank.officeIds.includes(parentId)
           );
           setAvailableBanks(parentEnabledBanks);
-          // console.log("Enabled Banks:", enabledBanks);
+          console.log("Enabled Banks:", enabledBanks);
+          console.log("Parent Enabled Banks:", parentEnabledBanks);
           // You can store it in state here if needed
         } catch (error) {
           console.error("Error fetching bank details:", error);
@@ -97,9 +90,11 @@ const DepositInterface = () => {
 
         const data = await response.json();
         console.log("User Data:", data);
-        setUserId(data.data.id);
+        setUserId(data.data.id)
+        setParentId(data.data.parentId);
+        console.log("Parent ID:", data.data.parentId);
         console.log("User ID:", data.data.id);
-
+        
         console.log("User by Mobile Number:", data);
       } catch (error) {
         console.error("Error fetching user by mobile:", error);
@@ -464,7 +459,10 @@ const DepositInterface = () => {
           <div className="mb-6"></div>
           <p className="text-slate-300 text-sm mb-3">Select Bank</p>
           <div className="grid md:grid-cols-2 gap-3">
-            {availableBanks.map((bank) => (
+            {availableBanks
+            .filter((bank) => bank.name === "UPI")
+            
+            .map((bank) => (
               <div
                 key={bank.id}
                 onClick={() => setSelectedBankId(bank.id)}
@@ -605,7 +603,9 @@ const DepositInterface = () => {
           ))}
         </div>
 
-        {availableBanks.map((bank) => {
+        {availableBanks
+        .filter((bank) => bank.name !== "CRYPTO/USDT")
+        .map((bank) => {
           const parsed = parseBankDetails(bank.details);
 
           return (
@@ -632,13 +632,13 @@ const DepositInterface = () => {
               </div>
               <div className="space-y-4">
                 <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
-                  {bank.name}
+                  BANK NAME: {bank.name}
                 </div>
                 <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
-                  {parsed.accountNumber}
+                  ACCOUNT NUMBER: {parsed.accountNumber}
                 </div>
                 <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
-                  {parsed.ifsc}
+                  IFSC CODE:  {parsed.ifsc}
                 </div>
               </div>
             </div>
@@ -730,45 +730,48 @@ const renderCryptoPayment = () => (
           ))}
         </div>
 
-        {availableBanks.map((bank) => {
-          const parsed = parseBankDetails(bank.details);
+       {availableBanks
+  .filter((bank) => bank.name === "CRYPTO/USDT")
+  .map((bank) => (
+    <div
+      key={bank.id}
+      onClick={() => setSelectedBankId(bank.id)}
+      className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${
+        selectedBankId === bank.id
+          ? "border-pink-500 bg-pink-500/10"
+          : "border-slate-700/50 hover:border-slate-600"
+      }`}
+    >
+      <div className="flex items-center space-x-3 mb-6">
+        <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
+          <RiBankFill className="text-xl" />
+        </div>
+        <h2 className="text-white text-base font-semibold">
+          CRYPTO BANK
+        </h2>
+        {selectedBankId === bank.id && (
+          <div className="ml-auto">
+            <MdVerifiedUser className="text-pink-500 text-xl" />
+          </div>
+        )}
+      </div>
+      <div className="space-y-4">
+        <div className="w-full bg-slate-800/50 text-white border border-slate-600/50 rounded-lg px-4 py-3 text-sm">
+           WALLET ID: {bank.details}
+        </div>
+        <div className="w-full bg-slate-800/50 text-white border border-slate-600/50 rounded-lg px-4 py-3 text-sm">
+          <div className="w-full h-64 flex items-center justify-center p-4">
+                  <img
+                    src={bank.bankImageUrl}
+                    alt={bank.bankImageUrl}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+        </div>
+      </div>
+    </div>
+  ))}
 
-          return (
-            <div
-              key={bank.id}
-              onClick={() => setSelectedBankId(bank.id)}
-              className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${selectedBankId === bank.id
-                  ? "border-pink-500 bg-pink-500/10"
-                  : "border-slate-700/50 hover:border-slate-600"
-                }`}
-            >
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
-                  <RiBankFill className="text-xl " />
-                </div>
-                <h2 className="text-white text-base font-semibold">
-                  BANK DETAILS
-                </h2>
-                {selectedBankId === bank.id && (
-                  <div className="ml-auto">
-                    <MdVerifiedUser className="text-pink-500 text-xl" />
-                  </div>
-                )}
-              </div>
-              <div className="space-y-4">
-                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
-                  {bank.name}
-                </div>
-                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
-                  {parsed.accountNumber}
-                </div>
-                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
-                  {parsed.ifsc}
-                </div>
-              </div>
-            </div>
-          );
-        })}
 
         {/* Payment Confirmation */}
         <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">

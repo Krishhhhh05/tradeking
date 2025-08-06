@@ -10,6 +10,7 @@ import {
 import { RiBankFill } from "react-icons/ri";
 import { useAuth } from "../AuthProvider"; // Adjust path
 import axios from "axios";
+import { FaClipboardCheck } from "react-icons/fa";
 
 const DepositInterface = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -27,7 +28,17 @@ const DepositInterface = () => {
   const [userId, setUserId] = useState("");
   const [status, setStatus] = useState("");
 
+  const [copied, setCopied] = useState(null); // To track which field was copied
 
+  const handleCopy = async (text, field) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(field);
+      setTimeout(() => setCopied(null), 2000); // Reset after 2 sec
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
   useEffect(() => {
     const fetchBankDetails = async () => {
       if (
@@ -94,7 +105,7 @@ const DepositInterface = () => {
         setParentId(data.data.parentId);
         console.log("Parent ID:", data.data.parentId);
         console.log("User ID:", data.data.id);
-        
+
         console.log("User by Mobile Number:", data);
       } catch (error) {
         console.error("Error fetching user by mobile:", error);
@@ -242,7 +253,7 @@ const DepositInterface = () => {
             </div>
           </div>
           <div className="flex flex-col w-28 p-2 items-center rounded-xl">
-            <img src="/logo_white.png" alt="Logo" className="w-full h-auto rounded-md"/>
+            <img src="/logo_white.png" alt="Logo" className="w-full h-auto rounded-md" />
           </div>
         </div>
 
@@ -310,8 +321,8 @@ const DepositInterface = () => {
                     setCustomAmount(String(amount)); // Show selected quick amount in input
                   }}
                   className={`h-14 rounded-md font-medium text-xs md:text-base transition-all ${selectedAmount === amount
-                      ? "bg-pink-500 text-white shadow-lg"
-                      : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
+                    ? "bg-pink-500 text-white shadow-lg"
+                    : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
                     }`}
                 >
                   ₹{amount}
@@ -372,8 +383,8 @@ const DepositInterface = () => {
                 key={method.id}
                 onClick={() => handlePaymentMethodSelect(method.id)}
                 className={`p-2 rounded-md flex flex-col items-center justify-center space-y-1 transition-all ${selectedPaymentMethod === method.id
-                    ? "bg-pink-500 text-white shadow-lg"
-                    : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
+                  ? "bg-pink-500 text-white shadow-lg"
+                  : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
                   }`}
               >
                 <div className="rounded-full p-3 md:w-16 md:h-16 flex justify-center items-center bg-violet-950 ">
@@ -415,9 +426,9 @@ const DepositInterface = () => {
               <p className="text-slate-300">Fast And Secure Transactions</p>
             </div>
           </div>
-         <div className="flex flex-col w-28 p-2 items-center rounded-md shadow-md" style={{ backgroundColor: 'white' }}>
-  <img src="/logo_white.png" alt="Logo" className="w-full h-auto rounded-md" />
-</div>
+          <div className="flex flex-col w-28 p-2 items-center rounded-md shadow-md" style={{ backgroundColor: 'white' }}>
+            <img src="/logo_white.png" alt="Logo" className="w-full h-auto rounded-md" />
+          </div>
 
 
 
@@ -437,8 +448,8 @@ const DepositInterface = () => {
               key={method}
               onClick={() => handlePaymentMethodSelect(method)}
               className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${selectedPaymentMethod === method
-                  ? "bg-pink-500 text-white"
-                  : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
+                ? "bg-pink-500 text-white"
+                : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
                 }`}
             >
               {method.toUpperCase()}
@@ -460,34 +471,34 @@ const DepositInterface = () => {
           <p className="text-slate-300 text-sm mb-3">Select Bank</p>
           <div className="grid md:grid-cols-2 gap-3">
             {availableBanks
-            .filter((bank) => bank.name === "UPI")
-            
-            .map((bank) => (
-              <div
-                key={bank.id}
-                onClick={() => setSelectedBankId(bank.id)}
-                className={`relative bg-slate-900/80 rounded-lg border cursor-pointer transition-all overflow-hidden ${selectedBankId === bank.id
+              .filter((bank) => bank.name === "UPI")
+
+              .map((bank) => (
+                <div
+                  key={bank.id}
+                  onClick={() => setSelectedBankId(bank.id)}
+                  className={`relative bg-slate-900/80 rounded-lg border cursor-pointer transition-all overflow-hidden ${selectedBankId === bank.id
                     ? "border-pink-500 bg-pink-500/10"
                     : "border-slate-700/50 hover:border-slate-600"
-                  }`}
-              >
-                <div className="w-full h-64 flex items-center justify-center p-4">
-                  <img
-                    src={bank.bankImageUrl}
-                    alt={bank.name}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="p-2 text-center">
-                  <p className="text-white text-sm font-medium">{bank.name}</p>
-                </div>
-                {selectedBankId === bank.id && (
-                  <div className="absolute top-2 right-2">
-                    <MdVerifiedUser className="text-pink-500 text-xl" />
+                    }`}
+                >
+                  <div className="w-full h-64 flex items-center justify-center p-4">
+                    <img
+                      src={bank.bankImageUrl}
+                      alt={bank.name}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                )}
-              </div>
-            ))}
+                  <div className="p-2 text-center">
+                    <p className="text-white text-sm font-medium">{bank.name}</p>
+                  </div>
+                  {selectedBankId === bank.id && (
+                    <div className="absolute top-2 right-2">
+                      <MdVerifiedUser className="text-pink-500 text-xl" />
+                    </div>
+                  )}
+                </div>
+              ))}
           </div>
         </div>
 
@@ -594,8 +605,8 @@ const DepositInterface = () => {
               key={method}
               onClick={() => handlePaymentMethodSelect(method)}
               className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${selectedPaymentMethod === method
-                  ? "bg-pink-500 text-white"
-                  : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
+                ? "bg-pink-500 text-white"
+                : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
                 }`}
             >
               {method.toUpperCase()}
@@ -604,46 +615,72 @@ const DepositInterface = () => {
         </div>
 
         {availableBanks
-        .filter((bank) => bank.name !== "CRYPTO/USDT")
-        .map((bank) => {
-          const parsed = parseBankDetails(bank.details);
+          .filter((bank) => bank.name !== "CRYPTO/USDT")
+          .map((bank) => {
+            const parsed = parseBankDetails(bank.details);
 
-          return (
-            <div
-              key={bank.id}
-              onClick={() => setSelectedBankId(bank.id)}
-              className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${selectedBankId === bank.id
+            return (
+              <div
+                key={bank.id}
+                onClick={() => setSelectedBankId(bank.id)}
+                className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${selectedBankId === bank.id
                   ? "border-pink-500 bg-pink-500/10"
                   : "border-slate-700/50 hover:border-slate-600"
-                }`}
-            >
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
-                  <RiBankFill className="text-xl " />
-                </div>
-                <h2 className="text-white text-base font-semibold">
-                  BANK DETAILS
-                </h2>
-                {selectedBankId === bank.id && (
-                  <div className="ml-auto">
-                    <MdVerifiedUser className="text-pink-500 text-xl" />
+                  }`}
+              >
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
+                    <RiBankFill className="text-xl " />
                   </div>
-                )}
+                  <h2 className="text-white text-base font-semibold">
+                    BANK DETAILS
+                  </h2>
+                  {selectedBankId === bank.id && (
+                    <div className="ml-auto">
+                      <MdVerifiedUser className="text-pink-500 text-xl" />
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-4">
+                  <div className="relative w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
+                    BANK NAME: {bank.name}
+                    <button
+                      onClick={() => handleCopy(bank.name, 'bank')}
+                      className="absolute top-3 right-2 text-white hover:text-pink-400 transition"
+                      title="Copy"
+                    >
+                      <FaClipboardCheck className="w-4 h-4" />
+                    </button>
+                    {copied === 'bank' && <span className="absolute top-2 right-10 text-green-400 text-xs">Copied!</span>}
+                  </div>
+
+                  <div className="relative w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
+                    ACCOUNT NUMBER: {parsed.accountNumber}
+                    <button
+                      onClick={() => handleCopy(parsed.accountNumber, 'account')}
+                      className="absolute top-3 right-2 text-white hover:text-pink-400 transition"
+                      title="Copy"
+                    >
+                      <FaClipboardCheck className="w-4 h-4" />
+                    </button>
+                    {copied === 'account' && <span className="absolute top-2 right-10 text-green-400 text-xs">Copied!</span>}
+                  </div>
+
+                  <div className="relative w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
+                    IFSC CODE: {parsed.ifsc}
+                    <button
+                      onClick={() => handleCopy(parsed.ifsc, 'ifsc')}
+                      className="absolute top-3 right-2 text-white hover:text-pink-400 transition"
+                      title="Copy"
+                    >
+                      <FaClipboardCheck className="w-4 h-4" />
+                    </button>
+                    {copied === 'ifsc' && <span className="absolute top-2 right-10 text-green-400 text-xs">Copied!</span>}
+                  </div>
+                </div>
               </div>
-              <div className="space-y-4">
-                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
-                  BANK NAME: {bank.name}
-                </div>
-                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
-                  ACCOUNT NUMBER: {parsed.accountNumber}
-                </div>
-                <div className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50">
-                  IFSC CODE:  {parsed.ifsc}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
         {/* Payment Confirmation */}
         <div className="bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
@@ -684,7 +721,7 @@ const DepositInterface = () => {
       </div>
     </div>
   );
-const renderCryptoPayment = () => (
+  const renderCryptoPayment = () => (
     <div className="min-h-screen bg-slate-950 p-4 pb-20">
       <div className="max-w-4xl mx-auto pt-8">
         {/* Header */}
@@ -721,8 +758,8 @@ const renderCryptoPayment = () => (
               key={method}
               onClick={() => handlePaymentMethodSelect(method)}
               className={`flex-1 py-2 px-3 rounded-md font-medium transition-all ${selectedPaymentMethod === method
-                  ? "bg-pink-500 text-white"
-                  : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
+                ? "bg-pink-500 text-white"
+                : "bg-slate-950 text-slate-300 hover:bg-slate-800/80"
                 }`}
             >
               {method.toUpperCase()}
@@ -730,47 +767,52 @@ const renderCryptoPayment = () => (
           ))}
         </div>
 
-       {availableBanks
-  .filter((bank) => bank.name === "CRYPTO/USDT")
-  .map((bank) => (
-    <div
-      key={bank.id}
-      onClick={() => setSelectedBankId(bank.id)}
-      className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${
-        selectedBankId === bank.id
-          ? "border-pink-500 bg-pink-500/10"
-          : "border-slate-700/50 hover:border-slate-600"
-      }`}
-    >
-      <div className="flex items-center space-x-3 mb-6">
-        <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
-          <RiBankFill className="text-xl" />
-        </div>
-        <h2 className="text-white text-base font-semibold">
-          CRYPTO BANK
-        </h2>
-        {selectedBankId === bank.id && (
-          <div className="ml-auto">
-            <MdVerifiedUser className="text-pink-500 text-xl" />
-          </div>
-        )}
-      </div>
-      <div className="space-y-4">
-        <div className="w-full bg-slate-800/50 text-white border border-slate-600/50 rounded-lg px-4 py-3 text-sm">
-           WALLET ID: {bank.details}
-        </div>
-        <div className="w-full bg-slate-800/50 text-white border border-slate-600/50 rounded-lg px-4 py-3 text-sm">
-          <div className="w-full h-64 flex items-center justify-center p-4">
-                  <img
-                    src={bank.bankImageUrl}
-                    alt={bank.bankImageUrl}
-                    className="w-full h-full object-contain"
-                  />
+        {availableBanks
+          .filter((bank) => bank.name === "CRYPTO/USDT")
+          .map((bank) => (
+            <div
+              key={bank.id}
+              onClick={() => setSelectedBankId(bank.id)}
+              className={`bg-violet-950/40 backdrop-blur-sm rounded-xl p-6 mb-6 border cursor-pointer transition-all ${selectedBankId === bank.id
+                  ? "border-pink-500 bg-pink-500/10"
+                  : "border-slate-700/50 hover:border-slate-600"
+                }`}
+            >
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-6 h-6 bg-cyan-500 rounded-md flex items-center justify-center">
+                  <RiBankFill className="text-xl" />
                 </div>
-        </div>
-      </div>
-    </div>
-  ))}
+                <h2 className="text-white text-base font-semibold">
+                  CRYPTO BANK
+                </h2>
+                {selectedBankId === bank.id && (
+                  <div className="ml-auto">
+                    <MdVerifiedUser className="text-pink-500 text-xl" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-4">
+                <div className="relative w-full bg-slate-800/50 text-white border border-slate-600/50 rounded-lg px-4 py-3 text-sm">
+                  WALLET ID: {bank.details}
+                  <button
+                    onClick={() => handleCopy(bank.details, 'wallet')}
+                    className="absolute top-3 right-2 text-white hover:text-pink-400 transition"
+                    title="Copy"  >
+                      <FaClipboardCheck className="w-4 h-4" />
+                    </button>
+                </div>
+                <div className="w-full bg-slate-800/50 text-white border border-slate-600/50 rounded-lg px-4 py-3 text-sm">
+                  <div className="w-full h-64 flex items-center justify-center p-4">
+                    <img
+                      src={bank.bankImageUrl}
+                      alt={bank.bankImageUrl}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
 
 
         {/* Payment Confirmation */}

@@ -268,14 +268,14 @@ const DepositInterface = () => {
             </h2>
           </div>
           <div className="mb-6">
-            <p className="text-slate-300 text-sm mb-3">Mobile Number</p>
+            <p className="text-slate-300 text-sm mb-3">User Name</p>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-200">
+              {/* <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-200">
                 +91
-              </span>
+              </span> */}
               <input
                 type="text"
-                placeholder="Enter Mobile Number"
+                placeholder="Enter User Name"
                 value={mobileNumber}
                 onChange={handleMobileNumberChange}
                 className="w-full bg-slate-800/50 text-white placeholder-slate-400 border border-slate-600/50 rounded-lg pl-12 pr-4 py-3 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500/50 appearance-none"

@@ -288,6 +288,11 @@ const WithdrawalInterface = () => {
           </div>
         </div>
       </div>
+       <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm border-t border-gray-600/30 py-2 z-50">
+  <p className="text-center text-white/70 text-xs md:text-sm">
+    For queries regarding username contact:  <span className="text-cyan-400 font-semibold">+91 8962457184</span>
+  </p>
+</div>
     </div>
   );
 

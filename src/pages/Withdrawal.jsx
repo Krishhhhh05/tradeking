@@ -82,14 +82,13 @@ const WithdrawalInterface = () => {
     axios
       .request(config)
       .then((response) => {
-        setUser(response.data);
+        setUser(response?.data?.data);
+        console.log(response?.data?.data);
         // if(user.id === userData.userId && userDetails.password ===user.password){
         if (response) {
-          console.log(
-            "Verification successful. Proceeding with withdrawal request."
-          );
+          setStatusMessage("Verification successful");
         } else {
-          alert("Invalid mobile number or OTP.");
+          setStatusMessage("Invalid mobile number or OTP.");
         }
       })
       .catch((error) => {
@@ -105,8 +104,8 @@ const WithdrawalInterface = () => {
 
     let data = JSON.stringify({
       amount: selectedAmount || customAmount,
-      comment: userDetails.comment || "comment",
-      userId: user.id || userData.userId,
+      comment: userDetails?.comment || "comment",
+      userId: user?.id,
       authToken: `Bearer ${token}`,
     });
     const response = await fetch(
@@ -227,7 +226,7 @@ const WithdrawalInterface = () => {
             </div>
           </div>
           <div className="flex flex-col w-24 p-2 items-center ">
-            <img src="/logo_white.png" className="rounded-md"/>
+            <img src="/logo_white.png" className="rounded-md" />
           </div>
         </div>
 
@@ -288,11 +287,12 @@ const WithdrawalInterface = () => {
           </div>
         </div>
       </div>
-       <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm border-t border-gray-600/30 py-2 z-50">
-  <p className="text-center text-white/70 text-xs md:text-sm">
-    For queries regarding username contact:  <span className="text-cyan-400 font-semibold">+91 8962457184</span>
-  </p>
-</div>
+      <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm border-t border-gray-600/30 py-2 z-50">
+        <p className="text-center text-white/70 text-xs md:text-sm">
+          For queries regarding username contact:{" "}
+          <span className="text-cyan-400 font-semibold">+91 8962457184</span>
+        </p>
+      </div>
     </div>
   );
 
@@ -361,7 +361,7 @@ const WithdrawalInterface = () => {
                 </button>
 
                 <button
-                  onClick={verifyOTP}
+                  onClick={handleVerify}
                   disabled={!userDetails.mobile || !enteredOTP}
                   className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50"
                 >
@@ -437,10 +437,13 @@ const WithdrawalInterface = () => {
             </div> */}
           </div>
           <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm border-t border-gray-600/30 py-2 z-50">
-  <p className="text-center text-white/70 text-xs md:text-sm">
-    For queries regarding username contact:  <span className="text-cyan-400 font-semibold">+91 8962457184</span>
-  </p>
-</div>
+            <p className="text-center text-white/70 text-xs md:text-sm">
+              For queries regarding username contact:{" "}
+              <span className="text-cyan-400 font-semibold">
+                +91 8962457184
+              </span>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -88,7 +88,7 @@ const WithdrawalInterface = () => {
         if (response) {
           setStatusMessage("Verification successful");
         } else {
-          setStatusMessage("Invalid mobile number or OTP.");
+          setStatusMessage("Invalid mobile number or OTP. Contact on whatsapp for any queries");
         }
       })
       .catch((error) => {
